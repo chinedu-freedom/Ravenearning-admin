@@ -9,8 +9,31 @@ const poppins = Poppins({
 });
 
 export const metadata = {
+  metadataBase: new URL("https://ravenearning-admin.vercel.app"),
   title: "SatrixNow Admin Portal",
   description: "SatrixNow Administration & Operations Control Center",
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/logo.jpeg", type: "image/jpeg" },
+      { url: "/icon.png", type: "image/png" },
+    ],
+    shortcut: ["/logo.jpeg"],
+    apple: [
+      { url: "/logo.jpeg" },
+      { url: "/apple-icon.png", type: "image/png" },
+    ],
+  },
+  openGraph: {
+    title: "SatrixNow Admin Portal",
+    description: "SatrixNow Administration & Operations Control Center",
+    images: ["/logo.jpeg"],
+  },
+  twitter: {
+    card: "summary",
+    title: "SatrixNow Admin Portal",
+    images: ["/logo.jpeg"],
+  },
 };
 
 export default function RootLayout({ children }) {

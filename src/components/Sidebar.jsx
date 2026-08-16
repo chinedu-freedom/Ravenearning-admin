@@ -111,8 +111,8 @@ export function Sidebar({ isOpen, onClose }) {
         {/* Brand Header */}
         <div className="flex h-[75px] items-center px-5 border-b border-gray-100">
           <Link href="/dashboard" className="flex items-center gap-3 w-full group" onClick={handleLinkClick}>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#4f8cff] to-[#6ee7ff] flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
-              <Sparkles className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center bg-gray-50 border border-gray-100 shadow-sm group-hover:scale-105 transition-transform">
+              <img src="/logo.jpeg" alt="Logo" className="w-full h-full object-cover" />
             </div>
             <div>
               <span className="text-[17px] font-bold text-gray-800 tracking-tight block leading-tight">SatrixNow</span>

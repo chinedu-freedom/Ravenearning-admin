@@ -36,7 +36,7 @@ export default function LoginPage() {
   const { data: settingsResponse } = useFetchData("/settings", ["platform-settings"]);
   const settings = settingsResponse?.settings || {};
   const siteName = settings.site_name || "SatrixNow";
-  const siteLogo = settings.platform_logo || null;
+  const siteLogo = settings.platform_logo || "/logo.jpeg";
 
   useEffect(() => {
     setIsMounted(true);
@@ -91,7 +91,7 @@ export default function LoginPage() {
           <div className="mb-8 flex flex-col items-center text-center">
             {siteLogo ? (
               <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-sm flex items-center justify-center bg-gray-50 border border-gray-100 mb-4">
-                <img src={siteLogo} alt="Logo" className="w-full h-full object-contain" />
+                <img src={siteLogo} alt="Logo" className="w-full h-full object-cover" />
               </div>
             ) : (
               <div className="w-16 h-16 bg-gradient-to-tr from-[#4f8cff] to-[#6ee7ff] rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/25 mb-4 text-white">
