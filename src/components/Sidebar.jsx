@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -10,16 +10,10 @@ import {
   ClipboardCheck,
   CalendarCheck,
   Loader,
-  Newspaper,
-  Building,
-  Activity,
-  LogOut,
+  Users,
   ChevronDown,
-  ChevronUp,
-  TrendingUp,
   Sparkles
 } from "lucide-react";
-import { CookieManager } from "@/utils/cookie-utils";
 
 const navigation = [
   { name: "Home", href: "/dashboard", icon: Home },
@@ -36,11 +30,7 @@ const navigation = [
   { name: "Tasks", href: "/tasks", icon: ClipboardCheck },
   { name: "Daily Check-In", href: "/daily-check-in", icon: CalendarCheck },
   { name: "Spin Wheel", href: "/spin-wheel", icon: Loader },
-  { name: "News", href: "/news", icon: Newspaper },
-  { name: "Partners", href: "/partners", icon: Building },
-  { name: "Live Market", href: "/live-market", icon: TrendingUp }, 
-  { name: "Customers", href: "/customers", icon: ArrowRight },
-  { name: "Activity Monitor", href: "/activity-monitor", icon: Activity },
+  { name: "Customers", href: "/customers", icon: Users },
   {
     name: "Recharge Payments",
     icon: Play,
@@ -59,17 +49,12 @@ const navigation = [
       { name: "Rejected", href: "/withdrawals/rejected" }
     ]
   },
-  { name: "Slider Images", href: "/slider-images", icon: ArrowRight },
   {
     name: "Settings",
     icon: Play,
     children: [
       { name: "Profile", href: "/settings/profile" },
       { name: "Basic", href: "/settings/basic" },
-      { name: "Email Settings", href: "/settings/email" },
-      { name: "Countries & Rates", href: "/settings/countries" },
-      { name: "Languages", href: "/settings/languages" },
-      { name: "About Us", href: "/settings/about" },
       { name: "Commission", href: "/settings/commission" },
       { name: "Verification Password", href: "/settings/security" },
     ]
@@ -115,7 +100,7 @@ export function Sidebar({ isOpen, onClose }) {
               <img src="/logo.jpeg" alt="Logo" className="w-full h-full object-cover" />
             </div>
             <div>
-              <span className="text-[17px] font-bold text-gray-800 tracking-tight block leading-tight">SatrixNow</span>
+              <span className="text-[17px] font-bold text-gray-800 tracking-tight block leading-tight">Ravenearning</span>
               <span className="text-[10px] font-semibold text-[#4f8cff] uppercase tracking-wider block">Admin Panel</span>
             </div>
           </Link>
