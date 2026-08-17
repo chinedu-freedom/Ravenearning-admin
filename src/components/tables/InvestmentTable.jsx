@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useMemo, useEffect } from "react";
 import {
@@ -140,7 +140,7 @@ export default function InvestmentTable({ searchTerm = "" }) {
                   {inv.user?._id || "N/A"}
                 </TableCell>
                 <TableCell className="font-medium">
-                  {inv.user?.username || "N/A"}
+                  {inv.user?.phone || "Customer"}
                 </TableCell>
                 <TableCell>
                   {inv.plan?.title || "N/A"}
@@ -228,13 +228,13 @@ export default function InvestmentTable({ searchTerm = "" }) {
             <p className="text-sm text-gray-600">
               Are you sure you want to delete{" "}
               <span className="font-semibold">
-                {investmentToDelete?.user?.username || "this investment"}
+                {investmentToDelete?.user?.phone || "this investment"}
               </span>
               's investment record?
             </p>
             <div className="mt-3 p-3 bg-red-50 border border-red-100 rounded-md">
               <p className="text-xs text-red-600">
-                ⚠️ This action cannot be undone. All investment data will be permanently deleted.
+                âš ï¸ This action cannot be undone. All investment data will be permanently deleted.
               </p>
             </div>
           </div>

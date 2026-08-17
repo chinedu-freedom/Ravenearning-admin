@@ -218,7 +218,6 @@ export default function DepositTable({ searchTerm = "", statusFilter = "all" }) 
           <TableHeader>
             <TableRow className="bg-gray-50">
               <TableHead className="whitespace-nowrap">Deposit ID</TableHead>
-              <TableHead className="whitespace-nowrap">Username</TableHead>
               <TableHead className="whitespace-nowrap">Phone Number</TableHead>
               <TableHead className="whitespace-nowrap">Amount</TableHead>
               <TableHead className="whitespace-nowrap">Crypto</TableHead>
@@ -243,9 +242,6 @@ export default function DepositTable({ searchTerm = "", statusFilter = "all" }) 
                   <TableRow key={dep._id}>
                     <TableCell className="truncate max-w-[160px] font-medium whitespace-nowrap">
                       {dep._id || "N/A"}
-                    </TableCell>
-                    <TableCell className="whitespace-nowrap">
-                      {dep.user?.username || "N/A"}
                     </TableCell>
                     <TableCell className="truncate max-w-[200px] whitespace-nowrap">
                       {dep.user?.phone || dep.user?.username || "N/A"}
@@ -394,3 +390,4 @@ export default function DepositTable({ searchTerm = "", statusFilter = "all" }) 
     </div>
   );
 }
+

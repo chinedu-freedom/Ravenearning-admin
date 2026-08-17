@@ -35,8 +35,7 @@ export default function RejectedRechargePage() {
     id: d.id,
     sn: index + 1,
     userInfo: {
-      name: d.user?.full_name || "Unknown",
-      username: d.user?.phone || d.user?.username || "Unknown",
+      phone: d.user?.phone || "Customer",
       refId: (d.user_id || "").substring(0, 6).toUpperCase() || "N/A"
     },
     paymentInfo: {
@@ -59,8 +58,7 @@ export default function RejectedRechargePage() {
   const filteredData = displayData.filter((item) => {
     const searchLower = searchTerm.toLowerCase()
     return (
-      item.userInfo.name.toLowerCase().includes(searchLower) ||
-      item.userInfo.username.toLowerCase().includes(searchLower) ||
+      (item.userInfo.phone || "").toLowerCase().includes(searchLower) ||
       item.paymentInfo.paymentNumber.toLowerCase().includes(searchLower) ||
       item.paymentInfo.transactionId.toLowerCase().includes(searchLower)
     )
@@ -129,10 +127,7 @@ export default function RejectedRechargePage() {
                       <TableCell className="py-4">
                         <div className="flex flex-col space-y-1.5">
                           <div className="text-[13px] text-gray-700">
-                            Name: <span className="font-medium">{item.userInfo.name}</span>
-                          </div>
-                          <div className="text-[13px] text-gray-700">
-                            Username: <br />
+                            Phone Number: <br />
                             <span className="font-medium">{item.userInfo.username}</span>
                           </div>
                           <div className="text-[13px] text-gray-700">
@@ -206,3 +201,4 @@ export default function RejectedRechargePage() {
     </div>
   )
 }
+

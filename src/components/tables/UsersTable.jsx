@@ -189,7 +189,6 @@ export default function UsersTable({ searchTerm = "" }) {
           <TableHeader>
             <TableRow className="bg-gray-50">
               <TableHead className="whitespace-nowrap">User ID</TableHead>
-              <TableHead className="whitespace-nowrap">Username</TableHead>
               <TableHead className="whitespace-nowrap">Phone Number</TableHead>
               <TableHead className="whitespace-nowrap">Status</TableHead>
               <TableHead className="whitespace-nowrap">Created At</TableHead>
@@ -208,8 +207,6 @@ export default function UsersTable({ searchTerm = "" }) {
                   <TableCell className="font-medium truncate max-w-[120px] whitespace-nowrap">
                     {user._id}
                   </TableCell>
-
-                  <TableCell className="whitespace-nowrap">{user.username}</TableCell>
 
                   <TableCell className="whitespace-nowrap">{user.phone || user.username}</TableCell>
 
@@ -305,7 +302,7 @@ export default function UsersTable({ searchTerm = "" }) {
           <p className="text-sm text-gray-600">
             Are you sure you want to delete{" "}
             <span className="font-semibold">
-              {userToDelete?.username || "this user"}
+              {userToDelete?.phone || "this user"}
             </span>
             ? This action cannot be undone.
           </p>
@@ -345,9 +342,9 @@ export default function UsersTable({ searchTerm = "" }) {
           <p className="text-sm text-gray-600">
             You are about to reset the password for{" "}
             <span className="font-semibold">
-              {userToReset?.username || "this user"}
+              {userToReset?.phone || "this user"}
             </span>.
-            Please enter the new password below. It will be emailed to them automatically.
+            Please enter the new password below.
           </p>
 
           <div className="grid gap-2 py-4">
@@ -393,9 +390,9 @@ export default function UsersTable({ searchTerm = "" }) {
           </DialogHeader>
 
           <p className="text-sm text-gray-600">
-            You are about to edit the email for{" "}
+            You are about to edit the phone number for{" "}
             <span className="font-semibold">
-              {userToEditPhone?.username || "this user"}
+              {userToEditPhone?.phone || "this user"}
             </span>.
           </p>
 
@@ -437,3 +434,4 @@ export default function UsersTable({ searchTerm = "" }) {
     </div>
   );
 }
+

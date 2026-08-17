@@ -136,10 +136,7 @@ export default function RejectedWithdrawPage() {
                       <TableCell className="py-4">
                         <div className="flex flex-col space-y-1.5">
                           <div className="text-[13px] text-gray-700">
-                            Name: <span className="font-medium">{item.userInfo.name}</span>
-                          </div>
-                          <div className="text-[13px] text-gray-700">
-                            Username: <br />
+                            Phone Number: <br />
                             <span className="font-medium">{item.userInfo.username}</span>
                           </div>
                         </div>
@@ -224,3 +221,4 @@ export default function RejectedWithdrawPage() {
     </div>
   )
 }
+

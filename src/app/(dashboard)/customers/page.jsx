@@ -8,10 +8,7 @@ import {
   UserCheck, 
   UserX, 
   Search, 
-  Filter, 
   Edit, 
-  LogIn, 
-  Lock, 
   Trash2, 
   AlertTriangle,
   Loader2,
@@ -53,23 +50,19 @@ export default function CustomersPage() {
   const activeUsers = users.filter(u => u.is_active).length
   const bannedUsers = users.filter(u => !u.is_active).length
 
-  // Filter users based on query and status (specifically supporting phone search)
+  // Filter users based on query and status (specifically by phone number or ID)
   const filteredUsers = users.filter(user => {
     const rawSearch = searchTerm.trim().toLowerCase();
     const digitsSearch = rawSearch.replace(/\D/g, "");
 
     const userPhone = (user.phone || "").toLowerCase();
     const userPhoneDigits = (user.phone || "").replace(/\D/g, "");
-    const userFullName = (user.full_name || "").toLowerCase();
-    const userUsername = (user.username || "").toLowerCase();
     const userId = (user.id || "").toLowerCase();
 
     const matchesSearch = 
       !rawSearch ||
       userPhone.includes(rawSearch) ||
       (digitsSearch.length > 0 && userPhoneDigits.includes(digitsSearch)) ||
-      userFullName.includes(rawSearch) ||
-      userUsername.includes(rawSearch) ||
       userId.includes(rawSearch);
 
     const matchesStatus = 
@@ -155,7 +148,7 @@ export default function CustomersPage() {
           <div className="relative flex-1 w-full">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <Input 
-              placeholder="Search by phone number, name or ID..."
+              placeholder="Search by phone number or ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 border-gray-200 focus-visible:ring-0 focus-visible:border-blue-500/50 h-10 w-full rounded-lg"
@@ -184,7 +177,7 @@ export default function CustomersPage() {
             <TableHeader className="bg-gray-50/50 border-b">
               <TableRow className="hover:bg-transparent">
                 <TableHead className="font-bold text-gray-600 uppercase text-[11px] tracking-wider w-[50px] py-4">#</TableHead>
-                <TableHead className="font-bold text-gray-600 uppercase text-[11px] tracking-wider py-4">USER</TableHead>
+                <TableHead className="font-bold text-gray-600 uppercase text-[11px] tracking-wider py-4">PHONE NUMBER</TableHead>
                 <TableHead className="font-bold text-gray-600 uppercase text-[11px] tracking-wider py-4">DEPOSIT BALANCE</TableHead>
                 <TableHead className="font-bold text-gray-600 uppercase text-[11px] tracking-wider py-4">EARNING BALANCE</TableHead>
                 <TableHead className="font-bold text-gray-600 uppercase text-[11px] tracking-wider py-4">REGISTERED</TableHead>
@@ -219,14 +212,10 @@ export default function CustomersPage() {
                   <TableCell className="py-4">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-[#5A8DEE] text-white flex items-center justify-center font-bold text-sm shrink-0">
-                        {(user.phone || user.username || "U").charAt(0).toUpperCase()}
+                        {(user.phone || "U").charAt(0).toUpperCase()}
                       </div>
-                      <div>
-                        <div className="font-bold text-gray-800 text-[13px] leading-tight">{user.full_name || user.username || "Member"}</div>
-                        <div className="text-[11px] text-gray-500 mt-0.5 flex items-center gap-1">
-                          <Phone className="w-3 h-3 text-gray-400" />
-                          {user.phone || user.username}
-                        </div>
+                      <div className="font-bold text-gray-800 text-[13px]">
+                        {user.phone || "Member"}
                       </div>
                     </div>
                   </TableCell>
@@ -280,7 +269,7 @@ export default function CustomersPage() {
             </div>
             
             <p className="text-sm text-gray-500 mb-6">
-              Are you sure you want to delete <span className="font-semibold text-gray-800">{userToDelete.full_name || userToDelete.username || userToDelete.phone}</span>? This action is permanent and cannot be undone.
+              Are you sure you want to delete <span className="font-semibold text-gray-800">{userToDelete.phone || "this user"}</span>? This action is permanent and cannot be undone.
             </p>
 
             <div className="flex items-center justify-end gap-3">

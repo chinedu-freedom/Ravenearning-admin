@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useMemo } from "react";
 import {
@@ -92,7 +92,7 @@ export default function UserActivitiesTable() {
           <TableHeader>
             <TableRow className="bg-gray-50">
               <TableHead className="w-[200px]">
-                Username
+                Phone Number
               </TableHead>
               <TableHead className="w-[200px]">
                 Activity
@@ -118,7 +118,7 @@ export default function UserActivitiesTable() {
               filteredActivities.map((a) => (
                 <TableRow key={a._id}>
                   <TableCell className="font-medium whitespace-nowrap">
-                    {a.user?.username || "Unknown"}
+                    {a.user?.Phone Number || "Unknown"}
                   </TableCell>
                   <TableCell>{a.action}</TableCell>
                   <TableCell>
@@ -135,7 +135,7 @@ export default function UserActivitiesTable() {
                       day: "2-digit",
                       year: "numeric",
                     }) +
-                      " · " +
+                      " Â· " +
                       new Date(a.timestamp).toLocaleTimeString("en-US", {
                         hour: "2-digit",
                         minute: "2-digit",

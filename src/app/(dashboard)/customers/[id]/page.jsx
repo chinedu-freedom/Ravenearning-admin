@@ -5,10 +5,7 @@ import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { 
   ArrowLeft, 
-  User, 
   Phone,
-  Shield, 
-  ShieldCheck,
   ShieldAlert,
   CreditCard, 
   WalletCards, 
@@ -84,8 +81,6 @@ export default function CustomerDetailPage() {
   useEffect(() => {
     if (user && !user.error && !editData && !isLoading) {
       setEditData({
-        full_name: user.full_name || "",
-        username: user.username || "",
         phone: user.phone || "",
         is_active: user.is_active ?? true,
         can_deposit: user.can_deposit ?? true,
@@ -116,7 +111,7 @@ export default function CustomerDetailPage() {
 
       const data = await res.json()
       if (res.ok) {
-        toast.success(data.message || "Customer profile updated successfully")
+        toast.success(data.message || "Customer details updated successfully")
         setEditData(prev => ({
           ...prev,
           new_password: "",
@@ -125,7 +120,7 @@ export default function CustomerDetailPage() {
         refetch()
         queryClient.invalidateQueries()
       } else {
-        toast.error(data.message || data.error || "Failed to update customer profile")
+        toast.error(data.message || data.error || "Failed to update customer")
       }
     } catch (error) {
       toast.error(error.message || "An error occurred while saving changes")
@@ -177,7 +172,7 @@ export default function CustomerDetailPage() {
       })
       const data = await res.json()
       if (res.ok && data.token) {
-        toast.success(`Logging in as ${user.username || "user"}...`)
+        toast.success(`Logging in as ${user.phone || "user"}...`)
         window.open(`http://localhost:3000?impersonate_token=${data.token}`, "_blank")
       } else {
         toast.error(data.error || "Failed to impersonate user")
@@ -271,7 +266,7 @@ export default function CustomerDetailPage() {
           </Link>
           <div>
             <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
-              <span>{user.full_name || user.username || "Customer Details"}</span>
+              <span>{user.phone || "Customer Details"}</span>
               <StatusBadge status={user.is_active ? "ACTIVE" : "BANNED"} />
             </h1>
             <p className="text-xs text-muted-foreground mt-0.5">User Profile & Access Controls</p>
@@ -317,11 +312,11 @@ export default function CustomerDetailPage() {
           {/* Left Col: Profile Overview */}
           <div className="lg:col-span-4 p-6 border-b lg:border-b-0 lg:border-r border-border flex flex-col items-center lg:items-start text-center lg:text-left bg-muted/5">
             <div className="w-24 h-24 rounded-full border-4 border-card bg-[#5A8DEE] text-white flex items-center justify-center text-3xl font-bold mb-4 shadow-sm">
-              {(user.phone || user.username || "U").charAt(0).toUpperCase()}
+              {(user.phone || "U").charAt(0).toUpperCase()}
             </div>
-            <h2 className="text-xl font-bold text-foreground">{user.full_name || user.username || "Member"}</h2>
-            <div className="flex items-center gap-2 text-muted-foreground text-sm mt-1 mb-3 justify-center lg:justify-start">
-              <Phone className="w-4 h-4" /> {user.phone || user.username}
+            <h2 className="text-xl font-bold text-foreground">{user.phone || "Customer"}</h2>
+            <div className="flex items-center gap-2 text-muted-foreground text-sm mt-1 mb-3 justify-center lg:justify-start font-mono">
+              <Hash className="w-3.5 h-3.5" /> {(user.id || "").substring(0, 14)}...
             </div>
             <div className="mb-6">
               <StatusBadge status={user.is_active ? "ACTIVE" : "BANNED"} />
@@ -329,8 +324,8 @@ export default function CustomerDetailPage() {
 
             <div className="w-full space-y-3 pt-6 border-t border-border/50 text-sm">
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
-                <span className="text-muted-foreground flex items-center gap-2"><Hash className="w-3.5 h-3.5" /> User ID</span>
-                <span className="font-mono text-foreground bg-muted px-2 py-0.5 rounded text-xs">{(user.id || "").substring(0, 12)}...</span>
+                <span className="text-muted-foreground flex items-center gap-2"><Phone className="w-3.5 h-3.5" /> Phone</span>
+                <span className="font-semibold text-foreground">{user.phone || "N/A"}</span>
               </div>
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
                 <span className="text-muted-foreground flex items-center gap-2"><Calendar className="w-3.5 h-3.5" /> Registered</span>
@@ -369,17 +364,9 @@ export default function CustomerDetailPage() {
 
             {/* Edit Form */}
             <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-foreground border-b border-border pb-2">Edit Profile Details</h3>
+              <h3 className="text-sm font-semibold text-foreground border-b border-border pb-2">Edit Customer Details</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="space-y-2">
-                  <Label className="text-foreground">Full Name</Label>
-                  <Input value={editData.full_name} onChange={(e) => setEditData({ ...editData, full_name: e.target.value })} className="bg-background border-border text-foreground h-10" />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-foreground">Username</Label>
-                  <Input value={editData.username} onChange={(e) => setEditData({ ...editData, username: e.target.value })} className="bg-background border-border text-foreground h-10" />
-                </div>
-                <div className="space-y-2">
+                <div className="space-y-2 md:col-span-2">
                   <Label className="text-foreground">Phone Number</Label>
                   <Input value={editData.phone} onChange={(e) => setEditData({ ...editData, phone: e.target.value })} className="bg-background border-border text-foreground h-10" />
                 </div>
@@ -387,9 +374,9 @@ export default function CustomerDetailPage() {
                   <Label className="text-foreground flex items-center gap-2"><Lock className="w-4 h-4" /> Reset Login Password</Label>
                   <Input type="password" placeholder="Leave blank to keep current" value={editData.new_password} onChange={(e) => setEditData({ ...editData, new_password: e.target.value })} className="bg-background border-border text-foreground h-10" />
                 </div>
-                <div className="space-y-2 md:col-span-2">
-                  <Label className="text-foreground flex items-center gap-2"><KeyRound className="w-4 h-4 text-blue-500" /> Reset Withdrawal Password / PIN</Label>
-                  <Input type="password" placeholder="Enter new withdrawal password / PIN (leave blank to keep current)" value={editData.new_withdrawal_pin} onChange={(e) => setEditData({ ...editData, new_withdrawal_pin: e.target.value })} className="bg-background border-border text-foreground h-10" />
+                <div className="space-y-2">
+                  <Label className="text-foreground flex items-center gap-2"><KeyRound className="w-4 h-4 text-blue-500" /> Reset Withdrawal PIN</Label>
+                  <Input type="password" placeholder="Leave blank to keep current" value={editData.new_withdrawal_pin} onChange={(e) => setEditData({ ...editData, new_withdrawal_pin: e.target.value })} className="bg-background border-border text-foreground h-10" />
                 </div>
               </div>
             </div>
@@ -689,7 +676,7 @@ export default function CustomerDetailPage() {
             </DialogTitle>
           </DialogHeader>
           <div className="pt-6 pb-6">
-            <p className="text-muted-foreground">Are you sure you want to save these changes to the user's profile, permissions, and passwords?</p>
+            <p className="text-muted-foreground">Are you sure you want to save these changes to the user's phone, permissions, and passwords?</p>
             <div className="flex justify-end gap-3 mt-6">
               <Button variant="outline" onClick={() => setShowSaveConfirm(false)} className="border-border bg-background">Cancel</Button>
               <Button onClick={executeSave} disabled={isSaving} className="bg-[#5A8DEE] hover:bg-[#477ae0] text-white">

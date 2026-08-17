@@ -201,7 +201,6 @@ export default function WithdrawalTable({ searchTerm = "", statusFilter = "all" 
           <TableHeader>
             <TableRow className="bg-gray-50">
               <TableHead className="whitespace-nowrap">Withdrawal ID</TableHead>
-              <TableHead className="whitespace-nowrap">Username</TableHead>
               <TableHead className="whitespace-nowrap">Phone Number</TableHead>
               <TableHead className="whitespace-nowrap">Gross Amount</TableHead>
               <TableHead className="whitespace-nowrap">Fee (6%)</TableHead>
@@ -228,7 +227,6 @@ export default function WithdrawalTable({ searchTerm = "", statusFilter = "all" 
                     <TableCell className="truncate max-w-[160px] font-medium whitespace-nowrap">
                       {txn._id || "N/A"}
                     </TableCell>
-                    <TableCell className="whitespace-nowrap">{txn.user?.username || "N/A"}</TableCell>
                     <TableCell className="truncate max-w-[200px] whitespace-nowrap">
                       {txn.user?.phone || txn.user?.username || "N/A"}
                     </TableCell>
@@ -376,3 +374,4 @@ export default function WithdrawalTable({ searchTerm = "", statusFilter = "all" 
     </div>
   );
 }
+

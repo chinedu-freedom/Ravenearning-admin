@@ -47,7 +47,7 @@ export default function BonusUsesListPage() {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10 pointer-events-none" />
                 <Input
-                  placeholder="Search by customer name, phone number or gift code..."
+                  placeholder="Search by phone number or gift code..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-9 bg-white border-gray-200 h-10 w-full"
@@ -114,8 +114,8 @@ export default function BonusUsesListPage() {
                       </TableCell>
                       <TableCell className="py-4">
                         <div className="flex flex-col">
-                          <span className="font-medium text-[#5A8DEE] text-[13px]">{item.user?.full_name || "Unknown"}</span>
-                          <span className="text-gray-500 text-[12px]">{item.user?.phone || item.user?.username || "N/A"}</span>
+                          <span className="font-medium text-[#5A8DEE] text-[13px]">{item.user?.phone || "Customer"}</span>
+                          
                         </div>
                       </TableCell>
                       <TableCell className="py-4">
