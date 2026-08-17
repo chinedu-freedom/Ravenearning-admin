@@ -74,7 +74,7 @@ export default function ForgotPasswordPage() {
 
             <Button
               type="submit"
-              className="w-full bg-gradient-to-r from-[#4fb3ff] to-[#5ce3ff] text-white rounded-md py-3 font-medium transition-all shadow-sm cursor-pointer"
+              className="w-full bg-gradient-to-r from-[#4fb3ff] to-[#5ce3ff] text-white rounded-md h-10 text-sm font-medium hover:brightness-95 active:brightness-90 transition-all shadow-sm cursor-pointer"
               disabled={requestOtpMutation.isPending}
             >
               {requestOtpMutation.isPending ? "Sending..." : "Send Verification Code"}

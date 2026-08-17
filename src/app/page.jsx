@@ -172,7 +172,7 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              className="w-full bg-gradient-to-r from-[#4fb3ff] to-[#5ce3ff] text-white rounded-md py-3 font-medium transition-all shadow-sm"
+              className="w-full h-10 bg-gradient-to-r from-[#4fb3ff] to-[#5ce3ff] text-white hover:brightness-95 active:brightness-90 rounded-md text-sm font-medium transition-all shadow-sm cursor-pointer"
               disabled={loginMutation.isPending}
             >
               {loginMutation.isPending ? (
