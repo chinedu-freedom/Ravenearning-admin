@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { Search, Edit, Download, Package, CheckCircle, Clock, XCircle, Plus, Trash2, Loader2 } from "lucide-react"
@@ -254,7 +254,7 @@ export default function PlansManagementPage() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <div className="text-[13px] font-semibold text-foreground">${Number(plan.min_investment).toLocaleString()} - ${Number(plan.max_investment).toLocaleString()}</div>
+                      <div className="text-[13px] font-semibold text-foreground">R{Number(plan.min_investment).toLocaleString()} - R{Number(plan.max_investment).toLocaleString()}</div>
                     </TableCell>
                     <TableCell>
                       <Badge className={`${getTypeColor(plan.is_fixed_deposit)} hover:${getTypeColor(plan.is_fixed_deposit)} border-0 shadow-none font-bold`}>

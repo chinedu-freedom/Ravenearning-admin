@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
@@ -18,10 +18,10 @@ import {
 } from "@/components/ui/dialog";
 
 const mockDeposits = [
-  { id: "DEP-8492", user: "Alex Chen", amount: "$5,000.00", method: "Bitcoin (BTC)", status: "Completed", date: "Nov 02, 2025 14:30" },
-  { id: "DEP-8493", user: "Sarah Miller", amount: "$1,200.00", method: "Ethereum (ETH)", status: "Pending", date: "Nov 02, 2025 15:45" },
-  { id: "DEP-8494", user: "James Wilson", amount: "$10,000.00", method: "USDT (TRC20)", status: "Completed", date: "Nov 01, 2025 09:15" },
-  { id: "DEP-8495", user: "Elena Rodriguez", amount: "$500.00", method: "Bitcoin (BTC)", status: "Failed", date: "Oct 31, 2025 18:20" },
+  { id: "DEP-8492", user: "Alex Chen", amount: "R5,000.00", method: "Bitcoin (BTC)", status: "Completed", date: "Nov 02, 2025 14:30" },
+  { id: "DEP-8493", user: "Sarah Miller", amount: "R1,200.00", method: "Ethereum (ETH)", status: "Pending", date: "Nov 02, 2025 15:45" },
+  { id: "DEP-8494", user: "James Wilson", amount: "R10,000.00", method: "USDT (TRC20)", status: "Completed", date: "Nov 01, 2025 09:15" },
+  { id: "DEP-8495", user: "Elena Rodriguez", amount: "R500.00", method: "Bitcoin (BTC)", status: "Failed", date: "Oct 31, 2025 18:20" },
 ];
 
 export default function DepositsPage() {
