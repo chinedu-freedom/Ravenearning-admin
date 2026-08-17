@@ -55,10 +55,10 @@ export default function UsersTable({ searchTerm = "" }) {
   const [isResetting, setIsResetting] = useState(false);
   const [newPassword, setNewPassword] = useState("");
 
-  const [isEditEmailOpen, setIsEditEmailOpen] = useState(false);
-  const [userToEditEmail, setUserToEditEmail] = useState(null);
-  const [isEditingEmail, setIsEditingEmail] = useState(false);
-  const [newEmail, setNewEmail] = useState("");
+  const [isEditPhoneOpen, setisEditPhoneOpen] = useState(false);
+  const [userToEditPhone, setuserToEditPhone] = useState(null);
+  const [isEditingPhone, setisEditingPhone] = useState(false);
+  const [newPhone, setnewPhone] = useState("");
 
   const limit = 10;
 
@@ -150,35 +150,35 @@ export default function UsersTable({ searchTerm = "" }) {
     }
   };
 
-  const handleEditEmailClick = (user) => {
-    setUserToEditEmail(user);
-    setNewEmail(user.email || "");
-    setIsEditEmailOpen(true);
+  const handleEditPhoneClick = (user) => {
+    setuserToEditPhone(user);
+    setnewPhone(user.phone || user.username || "");
+    setisEditPhoneOpen(true);
     setOpenMenuId(null);
   };
 
-  const handleConfirmEditEmail = async () => {
-    if (!userToEditEmail?._id) return;
-    if (!newEmail.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
-      toast.error("Please enter a valid email address");
+  const handleConfirmEditPhone = async () => {
+    if (!userToEditPhone?._id) return;
+    if (!newPhone.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newPhone)) {
+      toast.error("Please enter a valid phone number");
       return;
     }
 
     try {
-      setIsEditingEmail(true);
-      const res = await patchData(`/api/users/${userToEditEmail._id}`, { email: newEmail.trim() });
+      setisEditingPhone(true);
+      const res = await patchData(`/api/users/${userToEditPhone._id}`, { phone: newPhone.trim() });
       if (res?.success) {
-        toast.success(res.message || "User email updated successfully!");
+        toast.success(res.message || "User phone number updated successfully!");
         refetch();
       } else {
-        toast.error(res?.message || "Failed to update email");
+        toast.error(res?.message || "Failed to update phone number");
       }
     } catch (error) {
-      toast.error(error?.message || "Failed to update email");
+      toast.error(error?.message || "Failed to update phone number");
     } finally {
-      setIsEditingEmail(false);
-      setIsEditEmailOpen(false);
-      setUserToEditEmail(null);
+      setisEditingPhone(false);
+      setisEditPhoneOpen(false);
+      setuserToEditPhone(null);
     }
   };
 
@@ -252,12 +252,12 @@ export default function UsersTable({ searchTerm = "" }) {
                           View Details
                         </DropdownMenuItem>
 
-                        {/* EDIT EMAIL */}
+                        {/* Edit Phone Number */}
                         <DropdownMenuItem
-                          onClick={() => handleEditEmailClick(user)}
+                          onClick={() => handleEditPhoneClick(user)}
                         >
                           <Mail className="w-4 h-4 mr-2" />
-                          Edit Email
+                          Edit Phone Number
                         </DropdownMenuItem>
 
                         {/* RESET PASSWORD */}
@@ -385,44 +385,44 @@ export default function UsersTable({ searchTerm = "" }) {
         </DialogContent>
       </Dialog>
 
-      {/* EDIT EMAIL MODAL */}
-      <Dialog open={isEditEmailOpen} onOpenChange={setIsEditEmailOpen}>
+      {/* Edit Phone Number MODAL */}
+      <Dialog open={isEditPhoneOpen} onOpenChange={setisEditPhoneOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Edit Email</DialogTitle>
+            <DialogTitle>Edit Phone Number</DialogTitle>
           </DialogHeader>
 
           <p className="text-sm text-gray-600">
             You are about to edit the email for{" "}
             <span className="font-semibold">
-              {userToEditEmail?.username || "this user"}
+              {userToEditPhone?.username || "this user"}
             </span>.
           </p>
 
           <div className="grid gap-2 py-4">
-            <Label htmlFor="new-email">New Email</Label>
+            <Label htmlFor="new-email">New Phone Number</Label>
             <Input
               id="new-email"
-              type="email"
-              placeholder="Enter new email address"
-              value={newEmail}
-              onChange={(e) => setNewEmail(e.target.value)}
+              type="text"
+              placeholder="Enter new phone number"
+              value={newPhone}
+              onChange={(e) => setnewPhone(e.target.value)}
               autoComplete="off"
             />
           </div>
 
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline" disabled={isEditingEmail}>
+              <Button variant="outline" disabled={isEditingPhone}>
                 Cancel
               </Button>
             </DialogClose>
 
             <Button
-              disabled={isEditingEmail}
-              onClick={handleConfirmEditEmail}
+              disabled={isEditingPhone}
+              onClick={handleConfirmEditPhone}
             >
-              {isEditingEmail ? (
+              {isEditingPhone ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   Saving

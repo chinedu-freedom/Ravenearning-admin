@@ -1,30 +1,43 @@
-"use client"
+﻿"use client"
 
-import { useState, useRef } from "react"
-import { Search, Edit, Lock, LogIn, Users, CheckCircle, Clock, Ban, UserCog, History, RotateCcw, Trash2, AlertTriangle } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { StatusBadge } from "@/components/ui/status-badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { toast } from "sonner"
+import { useState } from "react"
 import Link from "next/link"
-
-import { useFetchData } from "@/hooks/useApi"
 import { format } from "date-fns"
-import { Loader2 } from "lucide-react"
+import { 
+  Users, 
+  UserCheck, 
+  UserX, 
+  Search, 
+  Filter, 
+  Edit, 
+  LogIn, 
+  Lock, 
+  Trash2, 
+  AlertTriangle,
+  Loader2,
+  Phone
+} from "lucide-react"
 
-export default function CustomersManagementPage() {
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent } from "@/components/ui/card"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { StatusBadge } from "@/components/ui/status-badge"
+import { useFetchData, useDelete } from "@/hooks/useApi"
+import { toast } from "sonner"
+
+export default function CustomersPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all-status")
-  const [countryFilter, setCountryFilter] = useState("all-countries")
   const [userToDelete, setUserToDelete] = useState(null)
   const [isDeleting, setIsDeleting] = useState(false)
-  const deletingRef = useRef(false)
 
+  // Fetch Users
+  const { data: usersResponse, isLoading, refetch } = useFetchData("/admin/users", ["admin-users"])
+  const deleteMutation = useDelete((id) => `/admin/users/${id}`, ["admin-users"])
+
+  // Read platform symbol
   let symbol = "R";
   if (typeof window !== "undefined") {
     try {
@@ -33,122 +46,112 @@ export default function CustomersManagementPage() {
     } catch (e) {}
   }
 
-  const { data: usersRes, isLoading, mutate } = useFetchData("/admin/users", ["adminUsers"]);
-  const usersData = Array.isArray(usersRes) ? usersRes : usersRes?.data || [];
+  const users = Array.isArray(usersResponse) ? usersResponse : (usersResponse?.data || [])
+
+  // Calculate dynamic stats
+  const totalUsers = users.length
+  const activeUsers = users.filter(u => u.is_active).length
+  const bannedUsers = users.filter(u => !u.is_active).length
+
+  // Filter users based on query and status
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = 
+      (user.full_name && user.full_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (user.phone && user.phone.includes(searchTerm)) ||
+      (user.username && user.username.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      user.id.toLowerCase().includes(searchTerm.toLowerCase())
+
+    const matchesStatus = 
+      statusFilter === "all-status" || 
+      (statusFilter === "active" && user.is_active) || 
+      (statusFilter === "banned" && !user.is_active)
+
+    return matchesSearch && matchesStatus
+  })
 
   const handleDeleteClick = (user) => {
     setUserToDelete(user)
   }
 
   const executeDeleteUser = async () => {
-    if (!userToDelete || deletingRef.current) return
-    deletingRef.current = true
-    setIsDeleting(true)
+    if (!userToDelete) return
     try {
-      const token = document.cookie.split("; ").find(row => row.startsWith("sec-admin-token="))?.split("=")[1];
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/admin/users/${userToDelete.id}`, {
-        method: "DELETE",
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      })
-      
-      if (res.ok) {
-        toast.success("User deleted successfully")
-        mutate() // Refresh data
-      } else {
-        const data = await res.json()
-        toast.error(data.error || "Failed to delete user")
-      }
-    } catch (error) {
-      toast.error("An error occurred while deleting user")
+      setIsDeleting(true)
+      await deleteMutation.mutateAsync(userToDelete.id)
+      toast.success("User account deleted successfully")
+      setUserToDelete(null)
+      refetch()
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to delete user")
     } finally {
       setIsDeleting(false)
-      setUserToDelete(null)
-      deletingRef.current = false
     }
   }
 
-
-
-  const uniqueCountriesMap = usersData.reduce((acc, user) => {
-    if (user.country && user.country.country_code) {
-      acc[user.country.country_code.toLowerCase()] = user.country.country_name || user.country.country_code;
-    }
-    return acc;
-  }, {});
-
-  const filteredUsers = usersData.filter((user) => {
-    const matchesSearch = 
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      (user.username || "").toLowerCase().includes(searchTerm.toLowerCase())
-      
-    const statusStr = user.is_active ? "active" : "banned"
-    const matchesStatus = statusFilter === "all-status" || statusStr === statusFilter.toLowerCase()
-    const matchesCountry = countryFilter === "all-countries" || (user.country?.country_code || "").toLowerCase() === countryFilter.toLowerCase()
-
-    return matchesSearch && matchesStatus && matchesCountry
-  })
-
-  const activeUsersCount = usersData.filter(u => u.is_active).length;
-  const bannedUsersCount = usersData.filter(u => !u.is_active).length;
-
-  const stats = [
-    { title: "Total Users", value: usersData.length.toString(), icon: Users, color: "text-blue-600", bg: "bg-blue-100" },
-    { title: "Active Users", value: activeUsersCount.toString(), icon: CheckCircle, color: "text-blue-600", bg: "bg-blue-100" },
-    { title: "Unverified Users", value: "0", icon: Clock, color: "text-yellow-600", bg: "bg-yellow-100" },
-    { title: "Banned Users", value: bannedUsersCount.toString(), icon: Ban, color: "text-red-600", bg: "bg-red-100" },
-  ]
-
   return (
-    <div className="space-y-6">
-      
-      {/* Stats Cards - Built using packages page format */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
-          <Card key={index} className="hover:shadow-lg transition-shadow border-none shadow-sm bg-white rounded-xl">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-700">{stat.value}</h3>
-                  <p className="text-[13px] font-medium text-gray-500 mt-1 tracking-wide">{stat.title}</p>
-                </div>
-                <div className={`w-10 h-10 rounded-full ${stat.bg} flex items-center justify-center ${stat.color}`}>
-                  <stat.icon className="w-5 h-5" strokeWidth={2} />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+    <div className="space-y-6 pb-12">
+      {/* Top Banner */}
+      <div className="bg-white border-none shadow-sm rounded-lg p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-bold text-gray-800">All Customers</h1>
+          <p className="text-sm text-gray-500 mt-1">Manage, monitor and update user profiles across your platform.</p>
+        </div>
       </div>
 
-      {/* Main Container */}
-      <Card className="border-none shadow-sm bg-white rounded-md overflow-hidden">
-        
-        {/* Header Section */}
-        <div className="p-6 border-b">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-2 text-gray-700">
-              <UserCog className="w-5 h-5 text-gray-500" />
-              <h2 className="text-[16px] font-semibold">User Management</h2>
+      {/* Metric Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="border-none shadow-sm bg-white rounded-lg">
+          <CardContent className="p-6 flex items-center justify-between">
+            <div>
+              <p className="text-[13px] font-medium text-gray-500 tracking-wide">Total Users</p>
+              <h3 className="text-2xl font-bold text-blue-600 mt-1">{totalUsers}</h3>
             </div>
-            <Button variant="outline" className="border-cyan-500 text-cyan-500 hover:bg-cyan-50 h-9 px-4 rounded-sm-sm">
-              <History className="w-4 h-4 mr-2" />
-              Activity
-            </Button>
+            <div className="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+              <Users className="w-6 h-6" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-none shadow-sm bg-white rounded-lg">
+          <CardContent className="p-6 flex items-center justify-between">
+            <div>
+              <p className="text-[13px] font-medium text-gray-500 tracking-wide">Active Users</p>
+              <h3 className="text-2xl font-bold text-emerald-600 mt-1">{activeUsers}</h3>
+            </div>
+            <div className="w-12 h-12 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
+              <UserCheck className="w-6 h-6" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-none shadow-sm bg-white rounded-lg">
+          <CardContent className="p-6 flex items-center justify-between">
+            <div>
+              <p className="text-[13px] font-medium text-gray-500 tracking-wide">Banned Users</p>
+              <h3 className="text-2xl font-bold text-red-500 mt-1">{bannedUsers}</h3>
+            </div>
+            <div className="w-12 h-12 rounded-lg bg-red-50 flex items-center justify-center text-red-500">
+              <UserX className="w-6 h-6" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Table Card */}
+      <Card className="border-none shadow-sm bg-white rounded-lg overflow-hidden">
+        {/* Filter Controls Header */}
+        <div className="p-6 border-b border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="relative flex-1 w-full">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Input 
+              placeholder="Search by phone number, name or ID..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 border-gray-200 focus-visible:ring-0 focus-visible:border-blue-500/50 h-10 w-full rounded-lg"
+            />
           </div>
 
-          {/* Filters Row */}
-          <div className="flex flex-wrap gap-4">
-            <div className="relative flex-1 min-w-[300px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
-                placeholder="Search users by name or email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 border-gray-300 h-10 rounded-md text-[13px]"
-              />
-            </div>
+          <div className="flex items-center gap-3 w-full md:w-auto">
             <div className="w-full md:w-[180px]">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="border-gray-200 h-10 text-gray-600">
@@ -158,19 +161,6 @@ export default function CustomersManagementPage() {
                   <SelectItem value="all-status">All Status</SelectItem>
                   <SelectItem value="active">Active</SelectItem>
                   <SelectItem value="banned">Banned</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="w-full md:w-[180px]">
-              <Select value={countryFilter} onValueChange={setCountryFilter}>
-                <SelectTrigger className="border-gray-200 h-10 text-gray-600">
-                  <SelectValue placeholder="All Countries" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all-countries">All Countries</SelectItem>
-                  {Object.entries(uniqueCountriesMap).map(([code, name]) => (
-                    <SelectItem key={code} value={code}>{name}</SelectItem>
-                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -184,7 +174,6 @@ export default function CustomersManagementPage() {
               <TableRow className="hover:bg-transparent">
                 <TableHead className="font-bold text-gray-600 uppercase text-[11px] tracking-wider w-[50px] py-4">#</TableHead>
                 <TableHead className="font-bold text-gray-600 uppercase text-[11px] tracking-wider py-4">USER</TableHead>
-                <TableHead className="font-bold text-gray-600 uppercase text-[11px] tracking-wider py-4">COUNTRY</TableHead>
                 <TableHead className="font-bold text-gray-600 uppercase text-[11px] tracking-wider py-4">DEPOSIT BALANCE</TableHead>
                 <TableHead className="font-bold text-gray-600 uppercase text-[11px] tracking-wider py-4">EARNING BALANCE</TableHead>
                 <TableHead className="font-bold text-gray-600 uppercase text-[11px] tracking-wider py-4">REGISTERED</TableHead>
@@ -195,14 +184,14 @@ export default function CustomersManagementPage() {
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-10 text-gray-500 bg-gray-50/30">
+                  <TableCell colSpan={7} className="text-center py-10 text-gray-500 bg-gray-50/30">
                     <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-[#5A8DEE]" />
                     Loading users...
                   </TableCell>
                 </TableRow>
               ) : filteredUsers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="h-[400px] text-center">
+                  <TableCell colSpan={7} className="h-[400px] text-center">
                     <div className="flex flex-col items-center justify-center text-gray-500">
                       <Search className="w-12 h-12 mb-4 text-gray-300" />
                       <p className="text-lg font-medium text-gray-600">No users found</p>
@@ -219,20 +208,18 @@ export default function CustomersManagementPage() {
                   <TableCell className="py-4">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-[#5A8DEE] text-white flex items-center justify-center font-bold text-sm shrink-0">
-                        {user.email.charAt(0).toUpperCase()}
+                        {(user.phone || user.username || "U").charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <div className="font-bold text-gray-800 text-[13px] leading-tight">{user.full_name || user.username || "Unnamed User"}</div>
-                        <div className="text-[11px] text-gray-400 mt-0.5">{user.email}</div>
+                        <div className="font-bold text-gray-800 text-[13px] leading-tight">{user.full_name || user.username || "Member"}</div>
+                        <div className="text-[11px] text-gray-500 mt-0.5 flex items-center gap-1">
+                          <Phone className="w-3 h-3 text-gray-400" />
+                          {user.phone || user.username}
+                        </div>
                       </div>
                     </div>
                   </TableCell>
 
-                  <TableCell className="py-4">
-                    <Badge showDot={false} className="bg-gray-400 hover:bg-gray-500 text-white border-0 px-2.5 py-0.5 rounded-[4px] font-medium text-[11px]">
-                      {user.country?.country_code || "N/A"}
-                    </Badge>
-                  </TableCell>
                   <TableCell className="py-4">
                     <span className="font-bold text-[#5A8DEE] text-[13px]">{symbol}{Number(user.balance || 0).toFixed(2)}</span>
                   </TableCell>
@@ -282,7 +269,7 @@ export default function CustomersManagementPage() {
               </div>
               <h3 className="text-lg font-bold text-center text-gray-900 mb-2">Delete User Account</h3>
               <p className="text-sm text-center text-gray-500">
-                Are you sure you want to delete <strong>{userToDelete.email}</strong>? This will permanently wipe all of their history, transactions, and investments. This action cannot be undone.
+                Are you sure you want to delete <strong>{userToDelete.phone || userToDelete.username}</strong>? This will permanently wipe all of their history, transactions, and investments. This action cannot be undone.
               </p>
             </div>
             <div className="bg-gray-50 px-6 py-4 flex items-center justify-end gap-3 border-t">

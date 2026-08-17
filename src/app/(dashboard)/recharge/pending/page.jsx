@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { Search, CreditCard, Loader2 } from "lucide-react"
@@ -77,7 +77,7 @@ export default function PendingRechargePage() {
     sn: index + 1,
     userInfo: {
       name: d.user?.full_name || "Unknown",
-      username: d.user?.email || "Unknown",
+      username: d.user?.phone || d.user?.username || "Unknown",
       refId: (d.user_id || "").substring(0, 6).toUpperCase() || "N/A"
     },
     paymentInfo: {

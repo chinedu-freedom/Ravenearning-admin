@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { Search, ArrowDownToLine, Loader2, Copy, Check } from "lucide-react"
@@ -48,7 +48,7 @@ export default function RejectedWithdrawPage() {
     sn: index + 1,
     userInfo: {
       name: w.user?.full_name || "Unknown",
-      username: w.user?.email || "Unknown"
+      username: w.user?.phone || w.user?.username || "Unknown"
     },
     withdrawInfo: {
       method: w.network || w.withdrawal_method || "Crypto",

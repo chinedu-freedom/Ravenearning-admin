@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { Search, ClipboardList, Gift } from "lucide-react"
@@ -20,7 +20,7 @@ export default function BonusUsesListPage() {
   const filteredData = usesData.filter((item) => {
     const matchesSearch = 
       (item.user?.full_name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (item.user?.email || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.user?.phone || item.user?.username || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
       (item.gift_code?.code || "").toLowerCase().includes(searchTerm.toLowerCase())
     
     // Gift code claims are successful once they are created
@@ -47,7 +47,7 @@ export default function BonusUsesListPage() {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10 pointer-events-none" />
                 <Input
-                  placeholder="Search by customer name, email or gift code..."
+                  placeholder="Search by customer name, phone number or gift code..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-9 bg-white border-gray-200 h-10 w-full"
@@ -115,7 +115,7 @@ export default function BonusUsesListPage() {
                       <TableCell className="py-4">
                         <div className="flex flex-col">
                           <span className="font-medium text-[#5A8DEE] text-[13px]">{item.user?.full_name || "Unknown"}</span>
-                          <span className="text-gray-500 text-[12px]">{item.user?.email || "N/A"}</span>
+                          <span className="text-gray-500 text-[12px]">{item.user?.phone || item.user?.username || "N/A"}</span>
                         </div>
                       </TableCell>
                       <TableCell className="py-4">
@@ -124,7 +124,7 @@ export default function BonusUsesListPage() {
                             {item.gift_code?.code || "N/A"}
                           </span>
                           <span className="text-gray-500 text-[12px] mt-1">
-                            Amount: ${Number(item.reward_amount || 0).toFixed(2)}
+                            Amount: R{Number(item.reward_amount || 0).toFixed(2)}
                           </span>
                         </div>
                       </TableCell>

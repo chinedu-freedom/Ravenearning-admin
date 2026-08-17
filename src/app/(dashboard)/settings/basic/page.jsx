@@ -1,127 +1,113 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect } from "react"
-import { HeadphonesIcon, Settings2, Check, Clock, Loader2, Save, Camera } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { useForm, Controller } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import { useFetchData, usePut } from "@/hooks/useApi"
+import { useImageSrc } from "@/hooks/useImageSrc"
+import { 
+  Building2, 
+  HeadphonesIcon, 
+  Settings2, 
+  Upload, 
+  Check, 
+  Clock, 
+  Percent, 
+  ShieldAlert, 
+  Loader2 
+} from "lucide-react"
+
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent } from "@/components/ui/card"
+import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { Switch } from "@/components/ui/switch"
-import { useForm, Controller } from "react-hook-form"
-import { useFetchData, usePut } from "@/hooks/useApi"
-import { toast } from "sonner"
-import dynamic from "next/dynamic"
-import "react-quill-new/dist/quill.snow.css"
 
-const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false })
-
-const ValidatedInput = ({ label, requiredNote, subText, icon: Icon, register, name, type="text" }) => (
-  <div className="flex flex-col space-y-1">
-    <label className="text-[13px] font-bold text-gray-700">{label}</label>
-    <div className="relative">
-      <Input 
-        type={type}
-        step={type === 'number' ? 'any' : undefined}
-        {...register(name)}
-        className="border-gray-200 focus-visible:ring-0 focus-visible:border-blue-500/50 focus:border-blue-500/50 h-10 pr-10 text-gray-700 bg-white rounded-lg"
-      />
-      <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center space-x-1">
-        {Icon && <Icon className="w-4 h-4 text-gray-400" />}
-        <Check className="w-4 h-4 text-blue-500" />
-      </div>
-    </div>
-  </div>
-)
-
-const RichTextEditor = ({ label, control, name }) => {
-  const modules = {
-    toolbar: [
-      [{ header: [1, 2, 3, false] }],
-      ["bold", "italic", "underline", "strike"],
-      [{ color: [] }, { background: [] }],
-      ["link"],
-      [{ list: "ordered" }, { list: "bullet" }],
-      ["clean"]
-    ]
-  };
-
-  return (
-    <div className="flex flex-col space-y-1 h-full">
-      <label className="text-[13px] font-bold text-gray-700">{label}</label>
-      <div className="rounded-lg border border-gray-200 overflow-hidden flex-1 flex flex-col bg-white">
-        <Controller
-          name={name}
-          control={control}
-          render={({ field }) => (
-            <ReactQuill 
-              theme="snow"
-              modules={modules}
-              value={field.value || ''} 
-              onChange={field.onChange} 
-              className="h-[150px] pb-10"
-            />
-          )}
-        />
-      </div>
-    </div>
-  );
-}
+const basicSettingsSchema = z.object({
+  site_name: z.string().min(1, "Site Name is required"),
+  site_title: z.string().min(1, "Site Title is required"),
+  currency_name: z.string().min(1, "Currency Name is required"),
+  currency_symbol: z.string().min(1, "Currency Symbol is required"),
+  timezone: z.string().min(1, "Timezone is required"),
+  registration_bonus: z.coerce.number().min(0, "Must be greater than or equal to 0"),
+  telegram_support: z.string().optional(),
+  deposit_notice: z.string().optional(),
+  withdrawal_notice: z.string().optional(),
+  auto_withdrawal: z.boolean().default(false),
+  deposit_bonus: z.coerce.number().min(0).default(0),
+  daily_withdrawal_limit: z.coerce.number().min(0).default(0),
+  min_deposit: z.coerce.number().min(0).default(10),
+  max_deposit: z.coerce.number().min(0).default(10000),
+  deposit_charge: z.coerce.number().min(0).default(0),
+  min_withdrawal: z.coerce.number().min(0).default(10),
+  max_withdrawal: z.coerce.number().min(0).default(10000),
+  withdrawal_charge: z.coerce.number().min(0).default(2),
+  withdrawal_open_time: z.string().optional(),
+  withdrawal_close_time: z.string().optional(),
+  require_investment_to_withdraw: z.boolean().default(false),
+  min_investment_to_withdraw: z.coerce.number().min(0).default(1),
+})
 
 export default function BasicSettingsPage() {
-  const [fileName, setFileName] = useState("");
-  const [previewUrl, setPreviewUrl] = useState("");
-  const [logoFile, setLogoFile] = useState(null);
-  const { data: settingsData, isLoading } = useFetchData("/admin/settings/platform", ["admin-platform-settings"])
-  const updateSettingsMutation = usePut("/admin/settings/platform", ["admin-platform-settings"])
-  
-  const { register, handleSubmit, control, reset } = useForm({
+  const [logoFile, setLogoFile] = useState(null)
+  const [logoPreview, setLogoPreview] = useState("")
+
+  const { data: responseData, isLoading } = useFetchData("/settings", ["platform-settings"])
+  const settingsData = responseData?.settings
+
+  const updateMutation = usePut("/admin/settings/platform", ["platform-settings"])
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors, isSubmitting }
+  } = useForm({
+    resolver: zodResolver(basicSettingsSchema),
     defaultValues: {
       site_name: "",
       site_title: "",
-      currency_name: "",
-      currency_symbol: "",
+      currency_name: "ZAR",
+      currency_symbol: "R",
       timezone: "UTC",
       registration_bonus: 0,
-      welcome_bonus_destination: "deposit",
       telegram_support: "",
-      whatsapp_support: "",
-      whatsapp_group: "",
-      telegram_community: "",
-      telegram_group: "",
       deposit_notice: "",
       withdrawal_notice: "",
       auto_withdrawal: false,
       deposit_bonus: 0,
       daily_withdrawal_limit: 0,
+      min_deposit: 10,
+      max_deposit: 10000,
+      deposit_charge: 0,
+      min_withdrawal: 10,
+      max_withdrawal: 10000,
+      withdrawal_charge: 2,
       withdrawal_open_time: "",
       withdrawal_close_time: "",
       require_investment_to_withdraw: false,
       min_investment_to_withdraw: 1,
-      min_withdrawal: 10,
-      max_withdrawal: 10000,
-      withdrawal_charge: 2,
-      min_deposit: 10,
-      max_deposit: 100000,
-      deposit_charge: 0,
     }
-  });
+  })
+
+  const previewSrc = useImageSrc(logoPreview, "")
 
   useEffect(() => {
     if (settingsData) {
+      if (settingsData.platform_logo) {
+        setLogoPreview(settingsData.platform_logo)
+      }
       reset({
         site_name: settingsData.site_name || "",
         site_title: settingsData.site_title || "",
-        currency_name: settingsData.currency_name || "",
-        currency_symbol: settingsData.currency_symbol || "",
+        currency_name: settingsData.currency_name || "ZAR",
+        currency_symbol: settingsData.currency_symbol || "R",
         timezone: settingsData.timezone || "UTC",
         registration_bonus: Number(settingsData.registration_bonus) || 0,
-        welcome_bonus_destination: settingsData.welcome_bonus_destination || "deposit",
-        telegram_support: settingsData.telegram_support || "",
-        whatsapp_support: settingsData.whatsapp_support || "",
-        whatsapp_group: settingsData.whatsapp_group || "",
-        telegram_community: settingsData.telegram_community || "",
-        telegram_group: settingsData.telegram_group || "",
+        telegram_support: settingsData.telegram_support || settingsData.telegram_support_link || "",
         deposit_notice: settingsData.deposit_notice || "",
         withdrawal_notice: settingsData.withdrawal_notice || "",
         auto_withdrawal: settingsData.auto_withdrawal ?? false,
@@ -160,84 +146,91 @@ export default function BasicSettingsPage() {
         registration_bonus: Number(formData.registration_bonus),
         deposit_bonus: Number(formData.deposit_bonus),
         daily_withdrawal_limit: Number(formData.daily_withdrawal_limit),
-        min_investment_to_withdraw: Number(formData.min_investment_to_withdraw),
+        min_deposit: Number(formData.min_deposit),
+        max_deposit: Number(formData.max_deposit),
+        deposit_charge: Number(formData.deposit_charge),
         min_withdrawal: Number(formData.min_withdrawal),
         max_withdrawal: Number(formData.max_withdrawal),
         withdrawal_charge: Number(formData.withdrawal_charge),
-        min_deposit: Number(formData.min_deposit),
-        max_deposit: Number(formData.max_deposit),
-        deposit_charge: Number(formData.deposit_charge)
+        min_investment_to_withdraw: Number(formData.min_investment_to_withdraw),
       }
-      await updateSettingsMutation.mutateAsync(payload)
+
+      await updateMutation.mutateAsync(payload)
       if (typeof window !== "undefined" && formData.currency_symbol) {
         localStorage.setItem("admin-platform-settings-symbol", formData.currency_symbol);
-        window.dispatchEvent(new Event("storage"));
       }
-    } catch (error) {
+    } catch (err) {
+      console.error(err)
     }
   }
 
-  const isSubmitting = updateSettingsMutation.isPending
+  const handleLogoChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      setLogoFile(file)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setLogoPreview(reader.result)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
 
   if (isLoading) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-        <p className="text-muted-foreground text-sm">Loading basic settings...</p>
+      <div className="flex h-96 items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
       </div>
     )
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 pb-10">
-      
-      {/* Section 1: Update Settings */}
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 pb-12">
+      <div>
+        <h1 className="text-[1.8rem] font-bold text-gray-800 tracking-tight">Basic Settings</h1>
+        <p className="text-[13px] text-gray-500 mt-0.5">Manage your platform details, branding, notices, and operational parameters.</p>
+      </div>
+
+      {/* Section 1: Basic Information */}
       <Card className="border-none shadow-sm bg-white rounded-lg">
         <CardContent className="p-8">
-          <h2 className="text-[1.2rem] font-bold text-gray-800 mb-6">Update Settings</h2>
-          
-          {/* Logo Upload Section */}
-          <div className="flex flex-col md:flex-row gap-8 mb-8">
-            <div className="flex-1">
-              <label className="text-[13px] font-bold text-gray-700 flex items-center gap-1 mb-1">
-                Platform Logo <span className="text-[11px] font-normal text-gray-400">(For header display)</span>
-              </label>
-              <div className="border border-gray-200 rounded-lg flex items-center h-10 w-full overflow-hidden relative bg-white shadow-sm">
-                <input 
-                  id="platform-logo-upload"
-                  type="file" 
-                  accept="image/*"
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                  onChange={(e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                      setFileName(file.name);
-                      setPreviewUrl(URL.createObjectURL(file));
-                      setLogoFile(file);
-                    } else {
-                      setFileName("");
-                      setPreviewUrl("");
-                      setLogoFile(null);
-                    }
-                  }}
-                />
-                <button type="button" className="bg-gray-50 border-r border-gray-200 px-4 h-full text-sm font-semibold text-gray-700 hover:bg-gray-100 transition-colors pointer-events-none">
-                  Choose file
-                </button>
-                <span className="px-4 text-sm text-gray-400 truncate flex-1">{fileName || "No file chosen"}</span>
+          <div className="mb-6">
+            <h2 className="text-[1.2rem] font-bold text-blue-600 flex items-center gap-2">
+              <Building2 className="w-5 h-5" />
+              Basic Information
+            </h2>
+            <p className="text-[12px] text-gray-400 mt-1">Configure your company identity, system currencies and brand assets</p>
+          </div>
+
+          <div className="mb-8 p-6 bg-slate-50/50 rounded-xl border border-dashed border-gray-200">
+            <div className="flex flex-col sm:flex-row items-center gap-6">
+              <div className="w-20 h-20 rounded-xl bg-white border border-gray-100 shadow-sm flex items-center justify-center overflow-hidden shrink-0">
+                {previewSrc ? (
+                  <img src={previewSrc} alt="Platform Logo" className="w-full h-full object-contain p-2" />
+                ) : (
+                  <Building2 className="w-8 h-8 text-gray-300" />
+                )}
               </div>
-              <p className="text-[11px] text-gray-400 mt-1">Suggested size: 48x48px (Square image)</p>
-            </div>
-            <div className="flex-1">
-              <label htmlFor="platform-logo-upload" className="w-24 h-24 bg-gray-50 border border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors block overflow-hidden shadow-sm">
-                <div className="w-full h-full flex items-center justify-center relative">
-                  {(previewUrl || settingsData?.platform_logo) ? (
-                    <img src={previewUrl || settingsData?.platform_logo} alt="Logo preview" className="w-full h-full object-cover" />
-                  ) : (
-                    <Camera className="w-6 h-6 text-gray-400" />
-                  )}
+              <div className="flex-1 text-center sm:text-left">
+                <label className="text-[14px] font-bold text-gray-800 block mb-1">Platform Brand Logo</label>
+                <p className="text-[12px] text-gray-500 mb-3">Upload your main brand logo. Recommended transparent PNG or SVG.</p>
+                <div className="flex items-center justify-center sm:justify-start gap-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="relative cursor-pointer bg-white hover:bg-gray-50 text-blue-600 border-blue-200 hover:border-blue-300 font-semibold text-xs h-9 px-4 rounded-lg shadow-none"
+                  >
+                    <Upload className="w-3.5 h-3.5 mr-1.5" />
+                    Upload Logo
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleLogoChange}
+                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                    />
+                  </Button>
                 </div>
-              </label>
+              </div>
             </div>
           </div>
 
@@ -292,30 +285,6 @@ export default function BasicSettingsPage() {
               register={register}
               subText="Direct link to your Telegram support account for customer inquiries" 
             />
-            <ValidatedInput 
-              label="WhatsApp Support" 
-              name="whatsapp_support"
-              register={register}
-              subText="WhatsApp link for customer support (format: https://wa.me/phonenumber)" 
-            />
-            <ValidatedInput 
-              label="Telegram Community Channel" 
-              name="telegram_community"
-              register={register}
-              subText="Public Telegram channel for announcements and community updates" 
-            />
-            <ValidatedInput 
-              label="Telegram Group Chat" 
-              name="telegram_group"
-              register={register}
-              subText="Telegram group for community discussions and member interactions" 
-            />
-            <ValidatedInput 
-              label="WhatsApp Group Link (Popup Modal)" 
-              name="whatsapp_group"
-              register={register}
-              subText="WhatsApp group link for the official information popup modal in the user dashboard" 
-            />
             
             <div className="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mt-2">
               <div className="h-full">
@@ -361,7 +330,7 @@ export default function BasicSettingsPage() {
               <div>
                 <label className="text-[13px] font-bold text-gray-700 block mb-0.5">Auto Withdrawal</label>
                 <p className="text-[12px] text-gray-500 leading-relaxed">
-                  If enabled, withdrawals will be automatically processed using the configured automatic gateway for the user's country. When disabled, all withdrawals will be queued for manual admin approval.
+                  If enabled, withdrawals will be automatically processed using the configured automatic gateway. When disabled, all withdrawals will be queued for manual admin approval.
                 </p>
               </div>
             </div>
@@ -487,5 +456,45 @@ export default function BasicSettingsPage() {
         </CardContent>
       </Card>
     </form>
+  )
+}
+
+function ValidatedInput({ label, name, type = "text", register, requiredNote = false, icon: Icon, subText }) {
+  return (
+    <div className="flex flex-col space-y-1">
+      <label className="text-[13px] font-bold text-gray-700 flex items-center justify-between">
+        <span>{label}</span>
+        {requiredNote && <span className="text-[10px] text-red-500 font-normal">REQUIRED</span>}
+      </label>
+      <div className="relative">
+        <Input 
+          type={type} 
+          {...register(name)}
+          className="border-gray-200 focus-visible:ring-0 focus-visible:border-blue-500/50 focus:border-blue-500/50 h-10 rounded-lg text-gray-700 text-[13px] bg-white"
+        />
+        {Icon && <Icon className="w-4 h-4 text-gray-400 absolute right-3 top-3 pointer-events-none" />}
+      </div>
+      {subText && <p className="text-[11px] text-gray-400 mt-0.5">{subText}</p>}
+    </div>
+  )
+}
+
+function RichTextEditor({ label, name, control }) {
+  return (
+    <div className="flex flex-col space-y-1 h-full">
+      <label className="text-[13px] font-bold text-gray-700">{label}</label>
+      <Controller
+        name={name}
+        control={control}
+        render={({ field }) => (
+          <Textarea 
+            value={field.value || ""} 
+            onChange={field.onChange}
+            className="border-gray-200 focus-visible:ring-0 focus-visible:border-blue-500/50 focus:border-blue-500/50 min-h-[140px] rounded-lg text-gray-700 text-[13px] bg-white leading-relaxed resize-none p-3"
+            placeholder={`Enter ${label.toLowerCase()} content...`}
+          />
+        )}
+      />
+    </div>
   )
 }

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useRef } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -18,7 +18,7 @@ export default function ManageAccount() {
 
   const [form, setForm] = useState({
     username: "",
-    email: "",
+    phone: "",
     dateOfBirth: "",
     city: "",
     postalCode: "",
@@ -35,7 +35,7 @@ export default function ManageAccount() {
 
       setForm({
         username: user.username || "",
-        email: user.email || "",
+        phone: user.phone || "",
         dateOfBirth: user.dateOfBirth
           ? new Date(user.dateOfBirth).toISOString().substring(0, 10)
           : "",
@@ -67,7 +67,7 @@ export default function ManageAccount() {
 
     const payload = {
       username: form.username,
-      email: form.email,
+      phone: form.phone,
       dateOfBirth: form.dateOfBirth,
       city: form.city,
       postalCode: form.postalCode,
@@ -139,9 +139,9 @@ export default function ManageAccount() {
             className="border-gray-200 focus-visible:ring-0 focus-visible:border-blue-500/50 focus:border-blue-500/50 bg-white h-10 text-gray-700 rounded-lg"
           />
           <Input
-            placeholder="Email Address"
-            name="email"
-            value={form.email}
+            placeholder="Phone Number"
+            name="phone"
+            value={form.phone}
             onChange={handleChange}
             className="border-gray-200 focus-visible:ring-0 focus-visible:border-blue-500/50 focus:border-blue-500/50 bg-white h-10 text-gray-700 rounded-lg"
           />
