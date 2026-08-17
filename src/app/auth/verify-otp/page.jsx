@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -7,8 +7,10 @@ import { otpSchema } from "@/lib/schemas";
 import { usePost, useFetchData } from "@/hooks/useApi"; 
 import { Input } from "@/components/ui/auth-input";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import logoImg from "../../../../public/logo.jpeg";
 
 export default function VerifyOtpPage() {
   const router = useRouter();
@@ -21,8 +23,7 @@ export default function VerifyOtpPage() {
 
   const { data: settingsResponse } = useFetchData("/settings", ["platform-settings"]);
   const settings = settingsResponse?.settings || {};
-  const siteName = settings.site_name || "Kryptex Mining";
-  const siteLogo = settings.platform_logo || null;
+  const siteName = settings.site_name || "Ravenearning";
 
   const verifyOtpMutation = usePost("/auth/admin/verify-otp", null);
   const resendOtpMutation = usePost("/auth/admin/forgot-password", null);
@@ -48,25 +49,25 @@ export default function VerifyOtpPage() {
   };
 
   const onSubmit = (data) => {
-    const email = localStorage.getItem("resetEmail");
-    if (!email) {
+    const phone = localStorage.getItem("resetPhone");
+    if (!phone) {
       toast.error("Session expired. Please request a new OTP.");
       return;
     }
 
-    verifyOtpMutation.mutate({ ...data, email }, {
+    verifyOtpMutation.mutate({ ...data, phone }, {
       onSuccess: () => router.push("/auth/reset-password"),
     });
   };
 
   const handleResend = () => {
-    const email = localStorage.getItem("resetEmail");
-    if (!email) {
-      toast.error("Session expired. Please go back and enter your email again.");
+    const phone = localStorage.getItem("resetPhone");
+    if (!phone) {
+      toast.error("Session expired. Please go back and enter your phone number again.");
       return;
     }
 
-    resendOtpMutation.mutate({ email }, {
+    resendOtpMutation.mutate({ phone }, {
       onSuccess: () => toast.success("OTP resent successfully"),
     });
   };
@@ -75,20 +76,12 @@ export default function VerifyOtpPage() {
     <div className="min-h-screen flex items-center justify-center bg-white font-sans text-gray-900">
       <div className="flex flex-col justify-center items-center w-full max-w-xl px-8 py-12">
         <div className="w-full max-w-sm text-center flex flex-col items-center">
-          {siteLogo ? (
-            <div className="w-16 h-16 rounded-full overflow-hidden shadow-sm flex items-center justify-center bg-gray-50 border border-gray-100 mb-4">
-              <img src={siteLogo} alt="Logo" className="w-full h-full object-contain" />
-            </div>
-          ) : (
-            <div className="w-16 h-16 bg-gradient-to-br from-[#4c1d95] to-[#0f172a] rounded-full flex items-center justify-center shadow-sm mb-4">
-              <div className="text-white text-xs font-bold tracking-wider">
-                {siteName.substring(0, 4).toUpperCase()}
-              </div>
-            </div>
-          )}
+          <div className="w-16 h-16 rounded-full overflow-hidden shadow-sm flex items-center justify-center bg-gray-50 border border-gray-100 mb-4">
+            <Image src={logoImg} alt="Logo" width={64} height={64} className="w-full h-full object-cover" priority />
+          </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Verify OTP</h2>
           <p className="text-sm text-gray-500 mb-8">
-            Enter the 4-digit code sent to your email to access {siteName} Admin Panel.
+            Enter the 4-digit code sent to your phone for {siteName} Admin Panel.
           </p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 w-full">
@@ -103,14 +96,14 @@ export default function VerifyOtpPage() {
                   value={digit}
                   onChange={(e) => handleChange(e.target.value, index)}
                   onKeyDown={(e) => handleKeyDown(e, index)}
-                  className="w-12 h-12 text-center text-lg font-semibold border border-gray-300 focus:ring-2 focus:ring-purple-500"
+                  className="w-12 h-12 text-center text-lg font-semibold border border-gray-300 focus:ring-2 focus:ring-[#4fb3ff]"
                 />
               ))}
             </div>
 
             <Button
               type="submit"
-              className="w-full bg-purple-600 text-white hover:bg-purple-700 rounded-md py-4.5 font-medium transition-all"
+              className="w-full bg-gradient-to-r from-[#4fb3ff] to-[#5ce3ff] text-white rounded-md py-3 font-medium transition-all shadow-sm cursor-pointer"
               disabled={verifyOtpMutation.isPending}
             >
               {verifyOtpMutation.isPending ? "Verifying..." : "Verify OTP"}
@@ -125,7 +118,7 @@ export default function VerifyOtpPage() {
                 className={`font-medium cursor-pointer hover:underline ${
                   resendOtpMutation.isPending
                     ? "text-gray-400 cursor-not-allowed"
-                    : "text-purple-600"
+                    : "text-[#4fb3ff]"
                 }`}
               >
                 {resendOtpMutation.isPending ? "Resending..." : "Resend"}

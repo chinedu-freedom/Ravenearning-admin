@@ -11,6 +11,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useEffect, useState } from "react";
+import { Smartphone } from "lucide-react";
 import { CookieManager } from "@/utils/cookie-utils";
 import logoImg from "../../public/logo.jpeg";
 
@@ -27,7 +28,7 @@ export default function LoginPage() {
   } = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
+      phone: "",
       password: "",
       keepMeLoggedIn: false,
     },
@@ -39,9 +40,9 @@ export default function LoginPage() {
 
   useEffect(() => {
     setIsMounted(true);
-    const rememberedEmail = localStorage.getItem("rememberedEmail");
-    if (rememberedEmail) {
-      setValue("email", rememberedEmail);
+    const rememberedPhone = localStorage.getItem("rememberedAdminPhone");
+    if (rememberedPhone) {
+      setValue("phone", rememberedPhone);
       setValue("keepMeLoggedIn", true);
     }
   }, [setValue]);
@@ -60,17 +61,21 @@ export default function LoginPage() {
     const keepMeLoggedIn = data.keepMeLoggedIn ?? false;
 
     if (keepMeLoggedIn) {
-      localStorage.setItem("rememberedEmail", data.email);
+      localStorage.setItem("rememberedAdminPhone", data.phone);
     } else {
-      localStorage.removeItem("rememberedEmail");
+      localStorage.removeItem("rememberedAdminPhone");
     }
 
-    loginMutation.mutate({ email: data.email, password: data.password, keepMeLoggedIn }, {
+    const rawDigits = data.phone.replace(/[^0-9]/g, '');
+    const cleanDigits = rawDigits.startsWith('0') ? rawDigits.substring(1) : rawDigits;
+    const normalizedPhone = cleanDigits.startsWith('27') ? cleanDigits : `27${cleanDigits}`;
+
+    loginMutation.mutate({ phone: normalizedPhone, password: data.password, keepMeLoggedIn }, {
       onSuccess: (res) => {
         if (res?.token) {
           const cookieOptions = {
             path: "/",
-            expires: keepMeLoggedIn ? 1 : 1 / 24, // 24 hours or 1 hour
+            expires: keepMeLoggedIn ? 1 : 1 / 24,
             secure: process.env.NODE_ENV === "production",
             sameSite: "Lax",
           };
@@ -102,20 +107,23 @@ export default function LoginPage() {
               Welcome back
             </h1>
             <p className="text-gray-500 text-sm">
-              Login to access your investment dashboard on {siteName}
+              Login to access your admin dashboard on {siteName}
             </p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div>
               <Input 
-                label="Email Address" 
-                type="email" 
-                {...register("email")} 
+                label="Phone Number" 
+                prefix="+27" 
+                icon={Smartphone}
+                placeholder="Phone number"
+                type="tel" 
+                {...register("phone")} 
               />
-              {errors.email && (
+              {errors.phone && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.email.message}
+                  {errors.phone.message}
                 </p>
               )}
             </div>

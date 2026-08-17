@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useMemo, useCallback, useEffect } from "react";
 import {
@@ -202,7 +202,7 @@ export default function WithdrawalTable({ searchTerm = "", statusFilter = "all" 
             <TableRow className="bg-gray-50">
               <TableHead className="whitespace-nowrap">Withdrawal ID</TableHead>
               <TableHead className="whitespace-nowrap">Username</TableHead>
-              <TableHead className="whitespace-nowrap">Email</TableHead>
+              <TableHead className="whitespace-nowrap">Phone Number</TableHead>
               <TableHead className="whitespace-nowrap">Gross Amount</TableHead>
               <TableHead className="whitespace-nowrap">Fee (6%)</TableHead>
               <TableHead className="whitespace-nowrap">Net Amount</TableHead>
@@ -230,7 +230,7 @@ export default function WithdrawalTable({ searchTerm = "", statusFilter = "all" 
                     </TableCell>
                     <TableCell className="whitespace-nowrap">{txn.user?.username || "N/A"}</TableCell>
                     <TableCell className="truncate max-w-[200px] whitespace-nowrap">
-                      {txn.user?.email || "N/A"}
+                      {txn.user?.phone || txn.user?.username || "N/A"}
                     </TableCell>
                     <TableCell className="whitespace-nowrap font-semibold text-gray-500">{symbol}{txn.amount?.toLocaleString()}</TableCell>
                     <TableCell className="whitespace-nowrap font-medium text-red-500">-{symbol}{txn.fee ? txn.fee.toLocaleString() : (txn.amount * 0.06).toLocaleString()}</TableCell>
@@ -244,7 +244,7 @@ export default function WithdrawalTable({ searchTerm = "", statusFilter = "all" 
                     <TableCell className="whitespace-nowrap">
                       {txn.requestedAt
                         ? new Date(txn.requestedAt).toLocaleDateString("en-GB")
-                        : "—"}
+                        : "â€”"}
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useMemo, useCallback, useEffect } from "react";
 import {
@@ -219,7 +219,7 @@ export default function DepositTable({ searchTerm = "", statusFilter = "all" }) 
             <TableRow className="bg-gray-50">
               <TableHead className="whitespace-nowrap">Deposit ID</TableHead>
               <TableHead className="whitespace-nowrap">Username</TableHead>
-              <TableHead className="whitespace-nowrap">Email</TableHead>
+              <TableHead className="whitespace-nowrap">Phone Number</TableHead>
               <TableHead className="whitespace-nowrap">Amount</TableHead>
               <TableHead className="whitespace-nowrap">Crypto</TableHead>
               <TableHead className="whitespace-nowrap">Status</TableHead>
@@ -248,7 +248,7 @@ export default function DepositTable({ searchTerm = "", statusFilter = "all" }) 
                       {dep.user?.username || "N/A"}
                     </TableCell>
                     <TableCell className="truncate max-w-[200px] whitespace-nowrap">
-                      {dep.user?.email || "N/A"}
+                      {dep.user?.phone || dep.user?.username || "N/A"}
                     </TableCell>
                     <TableCell className="whitespace-nowrap text-gray-900">
                       {formatCurrency(dep.amount)}
@@ -264,7 +264,7 @@ export default function DepositTable({ searchTerm = "", statusFilter = "all" }) 
                     <TableCell className="whitespace-nowrap">
                       {dep.fundedAt
                         ? new Date(dep.fundedAt).toLocaleDateString("en-GB")
-                        : "—"}
+                        : "â€”"}
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu

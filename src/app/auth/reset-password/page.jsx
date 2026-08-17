@@ -1,12 +1,14 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Input } from "@/components/ui/auth-input";
 import { Button } from "@/components/ui/button";
 import { usePost, useFetchData } from "@/hooks/useApi";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import logoImg from "../../../../public/logo.jpeg";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -17,19 +19,12 @@ export default function ResetPasswordPage() {
 
   const { data: settingsResponse } = useFetchData("/settings", ["platform-settings"]);
   const settings = settingsResponse?.settings || {};
-  const siteName = settings.site_name || "Kryptex Mining";
-  const siteLogo = settings.platform_logo || null;
+  const siteName = settings.site_name || "Ravenearning";
 
   const resetPasswordMutation = usePost("/auth/admin/reset-password", null);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const validatePassword = (password) => {
-    const regex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    return regex.test(password);
   };
 
   const handleSubmit = (e) => {
@@ -40,10 +35,8 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    if (!validatePassword(form.newPassword)) {
-      toast.error(
-        "Password must be at least 8 characters long, include one uppercase letter, one lowercase letter, one number, and one special character."
-      );
+    if (form.newPassword.length < 6) {
+      toast.error("Password must be at least 6 characters long");
       return;
     }
 
@@ -52,19 +45,19 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    const email = localStorage.getItem("resetEmail");
-    if (!email) {
-      toast.error("Session expired. Please request a new reset link.");
+    const phone = localStorage.getItem("resetPhone");
+    if (!phone) {
+      toast.error("Session expired. Please request a new reset code.");
       router.push("/auth/forgot-password");
       return;
     }
 
     resetPasswordMutation.mutate(
-      { email, newPassword: form.newPassword },
+      { phone, newPassword: form.newPassword },
       {
         onSuccess: () => {
-          localStorage.removeItem("resetEmail");
-          router.push("/"); // redirect to login
+          localStorage.removeItem("resetPhone");
+          router.push("/");
         },
       }
     );
@@ -75,17 +68,9 @@ export default function ResetPasswordPage() {
       <div className="flex flex-col justify-center items-center w-full max-w-xl px-8 py-12">
         <div className="w-full max-w-sm">
           <div className="mb-10 flex flex-col items-center text-center">
-            {siteLogo ? (
-              <div className="w-16 h-16 rounded-full overflow-hidden shadow-sm flex items-center justify-center bg-gray-50 border border-gray-100 mb-4">
-                <img src={siteLogo} alt="Logo" className="w-full h-full object-contain" />
-              </div>
-            ) : (
-              <div className="w-16 h-16 bg-gradient-to-br from-[#4c1d95] to-[#0f172a] rounded-full flex items-center justify-center shadow-sm mb-4">
-                <div className="text-white text-xs font-bold tracking-wider">
-                  {siteName.substring(0, 4).toUpperCase()}
-                </div>
-              </div>
-            )}
+            <div className="w-16 h-16 rounded-full overflow-hidden shadow-sm flex items-center justify-center bg-gray-50 border border-gray-100 mb-4">
+              <Image src={logoImg} alt="Logo" width={64} height={64} className="w-full h-full object-cover" priority />
+            </div>
             <h1 className="text-2xl font-bold text-gray-900 mb-1">
               Reset Password
             </h1>
@@ -113,7 +98,7 @@ export default function ResetPasswordPage() {
             <Button
               type="submit"
               disabled={resetPasswordMutation.isPending}
-              className="w-full bg-purple-600 text-white hover:bg-purple-700 rounded-md py-4.5 font-medium transition-all disabled:opacity-70"
+              className="w-full bg-gradient-to-r from-[#4fb3ff] to-[#5ce3ff] text-white rounded-md py-3 font-medium transition-all shadow-sm cursor-pointer disabled:opacity-70"
             >
               {resetPasswordMutation.isPending
                 ? "Resetting..."
@@ -124,7 +109,7 @@ export default function ResetPasswordPage() {
               Back to{" "}
               <Link
                 href="/"
-                className="text-purple-600 font-medium hover:underline cursor-pointer"
+                className="text-[#4fb3ff] font-medium hover:underline cursor-pointer"
               >
                 Login
               </Link>

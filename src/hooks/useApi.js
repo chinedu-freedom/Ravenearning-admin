@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -72,7 +72,7 @@ const getSuccessMessage = (method, endpoint, res) => {
   
   if (method === "POST") {
     if (path.includes("/auth/admin/login") || path.includes("/auth/login")) return "Logged in successfully!";
-    if (path.includes("/auth/admin/forgot-password") || path.includes("/auth/forgot-password")) return "OTP sent successfully to your email!";
+    if (path.includes("/auth/admin/forgot-password") || path.includes("/auth/forgot-password")) return "OTP sent successfully!";
     if (path.includes("/auth/admin/verify-otp") || path.includes("/auth/verify-otp")) return "OTP verified successfully!";
     if (path.includes("/auth/admin/reset-password") || path.includes("/auth/reset-password")) return "Password reset successfully!";
     if (path.includes("/admin/rewards/tasks")) return "Task reward created successfully!";
@@ -407,7 +407,7 @@ export const useDelete = (endpoint, queryKey, options = {}) => {
 //         refetchOnWindowFocus: options.refetchOnWindowFocus ?? false, // Make it configurable
 //     enabled: options.enabled ?? true,
 
-//     // 1️⃣ Retry logic
+//     // 1ï¸âƒ£ Retry logic
 //     retry: (failureCount, error) => {
 //       // Do not retry cancelled requests
 //       if (error?.name === "CanceledError") return false;
@@ -420,9 +420,9 @@ export const useDelete = (endpoint, queryKey, options = {}) => {
 //       return failureCount < 3;
 //     },
 
-//     // 2️⃣ Exponential backoff
+//     // 2ï¸âƒ£ Exponential backoff
 //     retryDelay: (attemptIndex) => {
-//       // 1s → 2s → 4s (max 5s)
+//       // 1s â†’ 2s â†’ 4s (max 5s)
 //       return Math.min(1000 * 2 ** attemptIndex, 5000);
 //     },
 

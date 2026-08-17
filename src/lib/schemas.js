@@ -1,15 +1,13 @@
-import { z } from "zod";
+﻿import { z } from "zod";
 
 export const loginSchema = z.object({
-  email: z.string().email("Enter a valid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-    keepMeLoggedIn: z.boolean().optional().default(false),
-
+  phone: z.string().min(5, "Please enter a valid phone number"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  keepMeLoggedIn: z.boolean().optional().default(false),
 });
 
-
 export const forgotPasswordSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
+  phone: z.string().min(5, "Please enter a valid phone number"),
 });
 
 export const otpSchema = z.object({
@@ -19,23 +17,12 @@ export const otpSchema = z.object({
     .regex(/^\d+$/, "OTP must contain only numbers"),
 });
 
-
-export const signupSchema = z
+export const resetPasswordSchema = z
   .object({
-    username: z.string().min(3, "User name must be at least 3 characters"),
-    email: z.string().email("Invalid email address"),
-    password: z
-      .string()
-      .min(8, "Password must be at least 8 characters")
-      .regex(/[A-Z]/, "Password must include at least one uppercase letter")
-      .regex(/[a-z]/, "Password must include at least one lowercase letter")
-      .regex(/[0-9]/, "Password must include at least one number")
-      .regex(/[^A-Za-z0-9]/, "Password must include at least one special character"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
     confirmPassword: z.string(),
-    adminSecret: z.string()
   })
   .refine((data) => data.password === data.confirmPassword, {
     path: ["confirmPassword"],
     message: "Passwords do not match",
   });
-

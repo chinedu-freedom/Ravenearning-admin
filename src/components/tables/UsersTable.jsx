@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useMemo, useEffect } from "react";
 import {
@@ -190,7 +190,7 @@ export default function UsersTable({ searchTerm = "" }) {
             <TableRow className="bg-gray-50">
               <TableHead className="whitespace-nowrap">User ID</TableHead>
               <TableHead className="whitespace-nowrap">Username</TableHead>
-              <TableHead className="whitespace-nowrap">Email</TableHead>
+              <TableHead className="whitespace-nowrap">Phone Number</TableHead>
               <TableHead className="whitespace-nowrap">Status</TableHead>
               <TableHead className="whitespace-nowrap">Created At</TableHead>
               <TableHead className="text-right whitespace-nowrap">Actions</TableHead>
@@ -211,7 +211,7 @@ export default function UsersTable({ searchTerm = "" }) {
 
                   <TableCell className="whitespace-nowrap">{user.username}</TableCell>
 
-                  <TableCell className="whitespace-nowrap">{user.email}</TableCell>
+                  <TableCell className="whitespace-nowrap">{user.phone || user.username}</TableCell>
 
                   <TableCell>
                     <Badge className={getStatusColor(user.accountStatus)}>
@@ -222,7 +222,7 @@ export default function UsersTable({ searchTerm = "" }) {
                   <TableCell className="whitespace-nowrap">
                     {user.createdAt
                       ? new Date(user.createdAt).toLocaleDateString("en-GB")
-                      : "—"}
+                      : "â€”"}
                   </TableCell>
 
                   <TableCell className="text-right">
