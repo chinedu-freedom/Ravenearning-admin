@@ -53,20 +53,31 @@ export default function CustomersPage() {
   const activeUsers = users.filter(u => u.is_active).length
   const bannedUsers = users.filter(u => !u.is_active).length
 
-  // Filter users based on query and status
+  // Filter users based on query and status (specifically supporting phone search)
   const filteredUsers = users.filter(user => {
+    const rawSearch = searchTerm.trim().toLowerCase();
+    const digitsSearch = rawSearch.replace(/\D/g, "");
+
+    const userPhone = (user.phone || "").toLowerCase();
+    const userPhoneDigits = (user.phone || "").replace(/\D/g, "");
+    const userFullName = (user.full_name || "").toLowerCase();
+    const userUsername = (user.username || "").toLowerCase();
+    const userId = (user.id || "").toLowerCase();
+
     const matchesSearch = 
-      (user.full_name && user.full_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (user.phone && user.phone.includes(searchTerm)) ||
-      (user.username && user.username.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      user.id.toLowerCase().includes(searchTerm.toLowerCase())
+      !rawSearch ||
+      userPhone.includes(rawSearch) ||
+      (digitsSearch.length > 0 && userPhoneDigits.includes(digitsSearch)) ||
+      userFullName.includes(rawSearch) ||
+      userUsername.includes(rawSearch) ||
+      userId.includes(rawSearch);
 
     const matchesStatus = 
       statusFilter === "all-status" || 
       (statusFilter === "active" && user.is_active) || 
-      (statusFilter === "banned" && !user.is_active)
+      (statusFilter === "banned" && !user.is_active);
 
-    return matchesSearch && matchesStatus
+    return matchesSearch && matchesStatus;
   })
 
   const handleDeleteClick = (user) => {
@@ -239,51 +250,60 @@ export default function CustomersPage() {
                           <Edit className="w-3.5 h-3.5" />
                         </Button>
                       </Link>
-                      <Button variant="outline" size="icon" className="h-7 w-7 text-cyan-500 border-gray-200 hover:bg-cyan-50" title="Login As">
-                        <LogIn className="w-3.5 h-3.5" />
-                      </Button>
-                      <Button variant="outline" size="icon" className="h-7 w-7 text-orange-400 border-gray-200 hover:bg-orange-50" title="Lock">
-                        <Lock className="w-3.5 h-3.5" />
-                      </Button>
-                      <Button onClick={() => handleDeleteClick(user)} variant="outline" size="icon" className="h-7 w-7 text-red-500 border-gray-200 hover:bg-red-50" title="Delete">
+                      <Button 
+                        onClick={() => handleDeleteClick(user)}
+                        variant="outline" 
+                        size="icon" 
+                        className="h-7 w-7 text-red-500 border-gray-200 hover:bg-red-50" 
+                        title="Delete"
+                      >
                         <Trash2 className="w-3.5 h-3.5" />
                       </Button>
                     </div>
                   </TableCell>
                 </TableRow>
-                ))
-              )}
+              )))}
             </TableBody>
           </Table>
         </div>
-        
       </Card>
 
       {/* Delete Confirmation Modal */}
       {userToDelete && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
-            <div className="p-6">
-              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-100 mx-auto mb-4">
-                <AlertTriangle className="w-6 h-6 text-red-600" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+          <div className="bg-white rounded-lg p-6 max-w-sm w-full shadow-lg border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center gap-3 text-red-600 mb-4">
+              <div className="p-2 bg-red-50 rounded-full">
+                <AlertTriangle className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-center text-gray-900 mb-2">Delete User Account</h3>
-              <p className="text-sm text-center text-gray-500">
-                Are you sure you want to delete <strong>{userToDelete.phone || userToDelete.username}</strong>? This will permanently wipe all of their history, transactions, and investments. This action cannot be undone.
-              </p>
+              <h3 className="text-lg font-bold text-gray-800">Delete User</h3>
             </div>
-            <div className="bg-gray-50 px-6 py-4 flex items-center justify-end gap-3 border-t">
-              <Button variant="outline" onClick={() => setUserToDelete(null)} disabled={isDeleting} className="h-10 text-gray-600 border-gray-300">
+            
+            <p className="text-sm text-gray-500 mb-6">
+              Are you sure you want to delete <span className="font-semibold text-gray-800">{userToDelete.full_name || userToDelete.username || userToDelete.phone}</span>? This action is permanent and cannot be undone.
+            </p>
+
+            <div className="flex items-center justify-end gap-3">
+              <Button 
+                variant="outline" 
+                onClick={() => setUserToDelete(null)}
+                disabled={isDeleting}
+                className="border-gray-200 text-gray-700"
+              >
                 Cancel
               </Button>
-              <Button onClick={executeDeleteUser} disabled={isDeleting} className="h-10 bg-red-600 hover:bg-red-700 text-white min-w-[100px]">
-                {isDeleting ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Yes, Delete"}
+              <Button 
+                onClick={executeDeleteUser}
+                disabled={isDeleting}
+                className="bg-red-600 hover:bg-red-700 text-white font-bold"
+              >
+                {isDeleting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Trash2 className="w-4 h-4 mr-2" />}
+                Delete
               </Button>
             </div>
           </div>
         </div>
       )}
-
     </div>
   )
 }

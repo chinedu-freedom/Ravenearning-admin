@@ -20,6 +20,7 @@ import {
   AlertTriangle,
   History,
   Lock,
+  KeyRound,
   Calendar,
   Clock,
   MapPin,
@@ -90,7 +91,8 @@ export default function CustomerDetailPage() {
         can_deposit: user.can_deposit ?? true,
         can_withdraw: user.can_withdraw ?? true,
         can_earn_daily: user.can_earn_daily ?? true,
-        new_password: ""
+        new_password: "",
+        new_withdrawal_pin: ""
       })
     }
   }, [user, editData, isLoading])
@@ -115,6 +117,11 @@ export default function CustomerDetailPage() {
       const data = await res.json()
       if (res.ok) {
         toast.success(data.message || "Customer profile updated successfully")
+        setEditData(prev => ({
+          ...prev,
+          new_password: "",
+          new_withdrawal_pin: ""
+        }))
         refetch()
         queryClient.invalidateQueries()
       } else {
@@ -377,8 +384,12 @@ export default function CustomerDetailPage() {
                   <Input value={editData.phone} onChange={(e) => setEditData({ ...editData, phone: e.target.value })} className="bg-background border-border text-foreground h-10" />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-foreground flex items-center gap-2"><Lock className="w-4 h-4" /> Change Password</Label>
+                  <Label className="text-foreground flex items-center gap-2"><Lock className="w-4 h-4" /> Reset Login Password</Label>
                   <Input type="password" placeholder="Leave blank to keep current" value={editData.new_password} onChange={(e) => setEditData({ ...editData, new_password: e.target.value })} className="bg-background border-border text-foreground h-10" />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label className="text-foreground flex items-center gap-2"><KeyRound className="w-4 h-4 text-blue-500" /> Reset Withdrawal Password / PIN</Label>
+                  <Input type="password" placeholder="Enter new withdrawal password / PIN (leave blank to keep current)" value={editData.new_withdrawal_pin} onChange={(e) => setEditData({ ...editData, new_withdrawal_pin: e.target.value })} className="bg-background border-border text-foreground h-10" />
                 </div>
               </div>
             </div>
@@ -678,7 +689,7 @@ export default function CustomerDetailPage() {
             </DialogTitle>
           </DialogHeader>
           <div className="pt-6 pb-6">
-            <p className="text-muted-foreground">Are you sure you want to save these changes to the user's profile and permissions?</p>
+            <p className="text-muted-foreground">Are you sure you want to save these changes to the user's profile, permissions, and passwords?</p>
             <div className="flex justify-end gap-3 mt-6">
               <Button variant="outline" onClick={() => setShowSaveConfirm(false)} className="border-border bg-background">Cancel</Button>
               <Button onClick={executeSave} disabled={isSaving} className="bg-[#5A8DEE] hover:bg-[#477ae0] text-white">
