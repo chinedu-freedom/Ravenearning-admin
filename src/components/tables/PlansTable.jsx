@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useMemo, useEffect } from "react";
 import {
@@ -46,7 +46,7 @@ export default function PlansTable({ searchTerm = "" }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [openMenuId, setOpenMenuId] = useState(null);
 
-  // ✅ EDIT STATE
+  // âœ… EDIT STATE
   const [openForm, setOpenForm] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
 
@@ -61,7 +61,6 @@ export default function PlansTable({ searchTerm = "" }) {
       maxDeposit: 500,
       dailyProfit: 1.5,
       contractDuration: 30,
-      isFixedDeposit: false,
       status: "Active",
       createdAt: new Date().toISOString(),
     },
@@ -72,7 +71,6 @@ export default function PlansTable({ searchTerm = "" }) {
       maxDeposit: 2000,
       dailyProfit: 2.5,
       contractDuration: 60,
-      isFixedDeposit: true,
       status: "Active",
       createdAt: new Date().toISOString(),
     },
@@ -83,7 +81,6 @@ export default function PlansTable({ searchTerm = "" }) {
       maxDeposit: 10000,
       dailyProfit: 4.0,
       contractDuration: 90,
-      isFixedDeposit: true,
       status: "Inactive",
       createdAt: new Date().toISOString(),
     }
@@ -187,7 +184,7 @@ export default function PlansTable({ searchTerm = "" }) {
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
                       <DropdownMenuSeparator />
 
-                      {/* ✅ EDIT BUTTON OPENS MODAL */}
+                      {/* âœ… EDIT BUTTON OPENS MODAL */}
                       <DropdownMenuItem
                         onClick={() => {
                           setSelectedPlan(plan);
@@ -228,14 +225,14 @@ export default function PlansTable({ searchTerm = "" }) {
 
       <Pagination meta={meta} onPageChange={setPage} />
 
-      {/* ✅ EDIT / CREATE MODAL */}
+      {/* âœ… EDIT / CREATE MODAL */}
       <PlanDialog
         open={openForm}
         setOpen={setOpenForm}
         initialData={selectedPlan}
       />
 
-      {/* ✅ DELETE MODAL */}
+      {/* âœ… DELETE MODAL */}
       <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>

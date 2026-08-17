@@ -1,7 +1,7 @@
-﻿"use client"
+"use client"
 
 import { useState } from "react"
-import { Search, Edit, Download, Package, CheckCircle, Clock, XCircle, Plus, Trash2, Loader2 } from "lucide-react"
+import { Search, Edit, Package, Plus, Trash2, Loader2, Sparkles, Calendar, DollarSign } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -23,7 +23,6 @@ import { format } from "date-fns"
 export default function PlansManagementPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
-  const [typeFilter, setTypeFilter] = useState("all")
 
   // Modal State
   const [open, setOpen] = useState(false)
@@ -35,7 +34,11 @@ export default function PlansManagementPage() {
   });
 
   const { data: plansRes, isLoading } = useFetchData("/admin/plans", ["plans"]);
-  const plansData = Array.isArray(plansRes) ? plansRes : plansRes?.data || [];
+  const plansData = Array.isArray(plansRes) 
+    ? [...plansRes].sort((a, b) => Number(a.min_investment || 0) - Number(b.min_investment || 0))
+    : plansRes?.data 
+      ? [...plansRes.data].sort((a, b) => Number(a.min_investment || 0) - Number(b.min_investment || 0))
+      : [];
 
   const deleteMutation = useDelete((id) => `/admin/plans/${id}`, ["plans"]);
 
@@ -58,120 +61,108 @@ export default function PlansManagementPage() {
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
       case "active":
-        return "bg-blue-100 text-green-800"
+        return "bg-emerald-100 text-emerald-800"
       case "inactive":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-amber-100 text-amber-800"
       default:
         return "bg-gray-100 text-gray-800"
     }
   }
 
-  const getTypeColor = (isFixed) => {
-    if (isFixed) {
-      return "bg-purple-100 text-purple-800"
-    }
-    return "bg-blue-100 text-blue-800"
-  }
-
   const filteredPlans = plansData.filter((plan) => {
     const matchesSearch =
-      plan.name?.toLowerCase().includes(searchTerm.toLowerCase())
+      plan.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      plan.description?.toLowerCase().includes(searchTerm.toLowerCase())
       
     const matchesStatus = statusFilter === "all" || 
       (statusFilter === "active" ? plan.status === true : plan.status === false);
-    
-    let matchesType = true;
-    if (typeFilter === "fixed") matchesType = plan.is_fixed_deposit === true;
-    if (typeFilter === "flexible") matchesType = plan.is_fixed_deposit === false;
 
-    return matchesSearch && matchesStatus && matchesType
+    return matchesSearch && matchesStatus
   })
 
   // Dynamic stats
   const activeCount = plansData.filter(p => p.status === true).length;
   const inactiveCount = plansData.filter(p => p.status === false).length;
-  const highestProfit = plansData.length > 0 
-    ? Math.max(...plansData.map(p => Number(p.daily_income))) 
-    : 0;
 
   const dynamicStats = [
     {
       title: "Total Packages",
       value: plansData.length.toString(),
       icon: Package,
+      color: "text-[#4f8cff]",
+      bgColor: "bg-blue-50"
     },
     {
       title: "Active Packages",
       value: activeCount.toString(),
-      icon: CheckCircle,
+      icon: Sparkles,
+      color: "text-emerald-600",
+      bgColor: "bg-emerald-50"
     },
     {
       title: "Inactive Packages",
       value: inactiveCount.toString(),
-      icon: Clock,
-    },
-    {
-      title: "Highest Profit",
-      value: `${highestProfit}%`,
-      icon: XCircle,
-    },
+      icon: Package,
+      color: "text-amber-600",
+      bgColor: "bg-amber-50"
+    }
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between w-full mb-6">
+    <div className="space-y-6 pb-12 font-['Poppins',sans-serif]">
+      {/* Header Banner */}
+      <div className="bg-white border-none shadow-sm rounded-xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Investment Packages</h1>
-          <p className="text-muted-foreground text-sm">Manage and track investment plans</p>
+          <h1 className="text-xl font-bold text-gray-800">VIP Investment Packages</h1>
+          <p className="text-sm text-gray-500 mt-1">Manage and configure Raven projector investment products and returns.</p>
         </div>
-        <div className="flex items-center space-x-2">
-          <Button 
-            onClick={() => {
-              setSelectedPlan(null)
-              setOpen(true)
-            }}
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-sm px-6 shadow-lg"
-          >
-            <Plus className="w-4 h-4 " />
-            Create Package
-          </Button>
-        </div>
+        <Button
+          onClick={() => {
+            setSelectedPlan(null)
+            setOpen(true)
+          }}
+          className="bg-[#4f8cff] hover:bg-[#3b7bed] text-white gap-2 font-semibold shadow-sm h-10 px-5 rounded-lg"
+        >
+          <Plus className="w-4 h-4" />
+          Create VIP Package
+        </Button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {dynamicStats.map((stat, index) => (
-          <Card key={index} className="hover:shadow-lg transition-shadow border-border shadow-sm bg-card rounded-xl">
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between">
+      {/* Metric Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {dynamicStats.map((stat, index) => {
+          const Icon = stat.icon
+          return (
+            <Card key={index} className="border-none shadow-sm bg-white rounded-xl">
+              <CardContent className="p-6 flex items-center justify-between">
                 <div>
-                  <h3 className="text-xl font-bold text-blue-600 dark:text-blue-400">{stat.value}</h3>
-                  <p className="text-[13px] font-medium text-muted-foreground mt-1 tracking-wide">{stat.title}</p>
+                  <p className="text-[13px] font-medium text-gray-500 tracking-wide">{stat.title}</p>
+                  <h3 className="text-2xl font-bold text-gray-800 mt-1">{stat.value}</h3>
                 </div>
-                <div className="w-8 h-8 rounded-md bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400">
-                  <stat.icon className="w-4 h-4" strokeWidth={2} />
+                <div className={`w-12 h-12 rounded-xl ${stat.bgColor} flex items-center justify-center ${stat.color}`}>
+                  <Icon className="w-6 h-6" />
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          )
+        })}
       </div>
 
-      {/* Filters */}
-      <Card className="border-none shadow-sm bg-card">
+      {/* Filter and Search */}
+      <Card className="border-none shadow-sm bg-white rounded-xl">
         <CardContent className="p-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10 pointer-events-none" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
-                placeholder="Search packages..."
+                placeholder="Search by product name..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 bg-background h-10 w-full"
+                className="pl-10 border-gray-200 focus-visible:ring-[#4f8cff] h-10 rounded-lg text-sm"
               />
             </div>
-             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full md:w-48 bg-background">
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full md:w-48 border-gray-200 h-10 text-gray-700">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent>
@@ -180,152 +171,172 @@ export default function PlansManagementPage() {
                 <SelectItem value="inactive">Inactive</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="w-full md:w-48 bg-background">
-                <SelectValue placeholder="Filter by type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="fixed">Fixed Deposit</SelectItem>
-                <SelectItem value="flexible">Flexible</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
         </CardContent>
       </Card>
 
-      {/* Orders Table */}
-      <Card className="border-none shadow-sm bg-card">
-        <CardHeader>
-          <CardTitle>Packages ({filteredPlans.length})</CardTitle>
+      {/* Packages Table */}
+      <Card className="border-none shadow-sm bg-white rounded-xl overflow-hidden">
+        <CardHeader className="p-6 pb-4 border-b border-gray-100">
+          <CardTitle className="text-base font-bold text-gray-800">All VIP Packages ({filteredPlans.length})</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           <div className="overflow-x-auto">
             <Table className="whitespace-nowrap">
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="font-bold text-[#475f7b] text-[12px] uppercase">#</TableHead>
-                  <TableHead className="font-bold text-[#475f7b] text-[12px] uppercase">Thumbnail</TableHead>
-                  <TableHead className="font-bold text-[#475f7b] text-[12px] uppercase">Name</TableHead>
-                  <TableHead className="font-bold text-[#475f7b] text-[12px] uppercase">Duration</TableHead>
-                  <TableHead className="font-bold text-[#475f7b] text-[12px] uppercase">Daily %</TableHead>
-                  <TableHead className="font-bold text-[#475f7b] text-[12px] uppercase">Min/Max</TableHead>
-                  <TableHead className="font-bold text-[#475f7b] text-[12px] uppercase">Deposit Type</TableHead>
-                  <TableHead className="font-bold text-[#475f7b] text-[12px] uppercase">Status</TableHead>
-                  <TableHead className="font-bold text-[#475f7b] text-[12px] uppercase text-right">Actions</TableHead>
+              <TableHeader className="bg-gray-50/50 border-b">
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="font-bold text-gray-600 text-[11px] uppercase tracking-wider pl-6 py-4">#</TableHead>
+                  <TableHead className="font-bold text-gray-600 text-[11px] uppercase tracking-wider py-4">PRODUCT</TableHead>
+                  <TableHead className="font-bold text-gray-600 text-[11px] uppercase tracking-wider py-4">PRICE (ZAR)</TableHead>
+                  <TableHead className="font-bold text-gray-600 text-[11px] uppercase tracking-wider py-4">DAILY INCOME (ZAR)</TableHead>
+                  <TableHead className="font-bold text-gray-600 text-[11px] uppercase tracking-wider py-4">TOTAL REVENUE (ZAR)</TableHead>
+                  <TableHead className="font-bold text-gray-600 text-[11px] uppercase tracking-wider py-4">DURATION</TableHead>
+                  <TableHead className="font-bold text-gray-600 text-[11px] uppercase tracking-wider py-4">STATUS</TableHead>
+                  <TableHead className="font-bold text-gray-600 text-[11px] uppercase tracking-wider text-right pr-6 py-4">ACTIONS</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center py-10 text-gray-500 bg-gray-50/30">
-                      <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
-                      Loading plans...
+                    <TableCell colSpan={8} className="text-center py-10 text-gray-500 bg-gray-50/30">
+                      <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-[#4f8cff]" />
+                      Loading packages...
                     </TableCell>
                   </TableRow>
                 ) : filteredPlans.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center py-12 text-gray-500 bg-gray-50/30">
+                    <TableCell colSpan={8} className="text-center py-12 text-gray-500 bg-gray-50/30">
                       <Package className="w-10 h-10 mx-auto mb-3 text-gray-400" />
-                      <p className="text-base font-medium text-gray-600 mb-1">No plans available</p>
+                      <p className="text-base font-medium text-gray-600 mb-1">No packages available</p>
                       <p className="text-sm text-gray-500">There are no packages matching your search criteria.</p>
                     </TableCell>
                   </TableRow>
-                ) : filteredPlans.map((plan, index) => (
-                  <TableRow key={plan.id}>
-                    <TableCell className="font-medium text-[13px] text-muted-foreground">{index + 1}</TableCell>
-                    <TableCell>
-                      {plan.image ? (
-                        <img src={plan.image} alt={plan.name} className="w-10 h-10 rounded-full object-cover border border-gray-100" />
-                      ) : (
-                        <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center border border-blue-100 shrink-0">
-                          <Package className="w-5 h-5 text-blue-500" />
+                ) : filteredPlans.map((plan, index) => {
+                  const price = Number(plan.min_investment || 0);
+                  const dailyReturnPercent = Number(plan.daily_income || 0);
+                  const dailyIncomeZar = (price * dailyReturnPercent) / 100;
+                  const totalRevenueZar = dailyIncomeZar * Number(plan.duration || 0);
+
+                  return (
+                    <TableRow key={plan.id} className="hover:bg-gray-50 border-b last:border-0">
+                      <TableCell className="font-bold text-[13px] text-gray-400 pl-6 py-4">
+                        VIP{index + 1}
+                      </TableCell>
+                      <TableCell className="py-4">
+                        <div className="flex items-center gap-3">
+                          {plan.image ? (
+                            <img src={plan.image} alt={plan.name} className="w-11 h-11 rounded-lg object-cover border border-gray-100 shrink-0" />
+                          ) : (
+                            <div className="w-11 h-11 rounded-lg bg-blue-50 flex items-center justify-center border border-blue-100 shrink-0">
+                              <Package className="w-5 h-5 text-[#4f8cff]" />
+                            </div>
+                          )}
+                          <div>
+                            <div className="font-bold text-[14px] text-gray-800 leading-tight">{plan.name}</div>
+                            <div className="text-[11px] text-gray-500 mt-0.5">{plan.description || "VIP Projector"}</div>
+                          </div>
                         </div>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="font-bold text-[14px] text-foreground">{plan.name}</div>
-                      <div className="text-[12px] text-muted-foreground">Created: {format(new Date(plan.created_at), 'MMM dd, yyyy')}</div>
-                    </TableCell>
-                    <TableCell className="text-[13px] font-medium text-muted-foreground">{plan.duration} Days</TableCell>
-                    <TableCell>
-                      <Badge className="bg-green-100/50 hover:bg-green-100 text-green-700 border-0 shadow-none font-bold">
-                        {Number(plan.daily_income)}% Daily
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-[13px] font-semibold text-foreground">R{Number(plan.min_investment).toLocaleString()} - R{Number(plan.max_investment).toLocaleString()}</div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={`${getTypeColor(plan.is_fixed_deposit)} hover:${getTypeColor(plan.is_fixed_deposit)} border-0 shadow-none font-bold`}>
-                        {plan.is_fixed_deposit ? "Fixed" : "Flexible"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={`${getStatusColor(plan.status ? "active" : "inactive")} hover:${getStatusColor(plan.status ? "active" : "inactive")} border-0 capitalize shadow-none font-bold`}>
-                        {plan.status ? "Active" : "Inactive"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end space-x-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="h-8 w-8 p-0"
-                          onClick={() => {
-                            setSelectedPlan(plan)
-                            setOpen(true)
-                          }}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                          onClick={() => handleDeleteClick(plan.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                      </TableCell>
+                      <TableCell className="py-4">
+                        <span className="font-bold text-gray-900 text-[14px]">
+                          ZAR {price.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                        </span>
+                      </TableCell>
+                      <TableCell className="py-4">
+                        <div className="flex flex-col">
+                          <span className="font-bold text-emerald-600 text-[14px]">
+                            ZAR {dailyIncomeZar.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                          </span>
+                          <span className="text-[11px] text-gray-400">
+                            ({dailyReturnPercent}% daily)
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-4">
+                        <span className="font-black text-[#2563eb] text-[14px]">
+                          ZAR {totalRevenueZar.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-[13px] font-semibold text-gray-700 py-4">
+                        {plan.duration}-DAYS
+                      </TableCell>
+                      <TableCell className="py-4">
+                        <Badge className={`${getStatusColor(plan.status ? "active" : "inactive")} border-0 capitalize shadow-none font-bold text-xs`}>
+                          {plan.status ? "Active" : "Inactive"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right pr-6 py-4">
+                        <div className="flex items-center justify-end space-x-1.5">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8 text-blue-600 border-gray-200 hover:bg-blue-50"
+                            onClick={() => {
+                              setSelectedPlan(plan)
+                              setOpen(true)
+                            }}
+                            title="Edit Plan"
+                          >
+                            <Edit className="w-3.5 h-3.5" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8 text-red-600 border-gray-200 hover:bg-red-50"
+                            onClick={() => handleDeleteClick(plan.id)}
+                            title="Delete Plan"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </div>
         </CardContent>
       </Card>
 
+      {/* Plan Dialog */}
       <PlanDialog
         open={open}
         setOpen={setOpen}
         initialData={selectedPlan}
       />
 
-      {/* Confirmation Dialog */}
-      <Dialog open={confirmDialog.isOpen} onOpenChange={(open) => setConfirmDialog(prev => ({ ...prev, isOpen: open }))}>
-        <DialogContent className="sm:max-w-[425px]">
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={confirmDialog.isOpen} onOpenChange={(isOpen) => setConfirmDialog(prev => ({ ...prev, isOpen }))}>
+        <DialogContent className="sm:max-w-md bg-white">
           <DialogHeader>
-            <DialogTitle>Confirm Plan Deletion</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete this investment plan? This action cannot be undone.
+            <DialogTitle className="text-gray-800">Delete Package</DialogTitle>
+            <DialogDescription className="text-gray-500">
+              Are you sure you want to delete this package? If users have active investments in this package, you should deactivate it instead.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="mt-4 gap-2 sm:gap-0">
+          <DialogFooter className="gap-2 sm:gap-0 mt-4">
             <Button
               variant="outline"
-              onClick={() => setConfirmDialog(prev => ({ ...prev, isOpen: false }))}
+              onClick={() => setConfirmDialog({ isOpen: false, planId: null })}
+              className="border-gray-200"
             >
               Cancel
             </Button>
             <Button
-              variant="default"
+              variant="destructive"
               onClick={executeDelete}
-              className="bg-red-600 hover:bg-red-700 text-white"
               disabled={deleteMutation.isPending}
+              className="bg-red-600 hover:bg-red-700 font-bold"
             >
-              {deleteMutation.isPending ? "Deleting..." : "Confirm Delete"}
+              {deleteMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete Package"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
