@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
@@ -17,6 +17,9 @@ const Input = React.forwardRef(
       onChange,
       id,
       name,
+      prefix,
+      icon: Icon,
+      placeholder,
       ...props
     },
     ref
@@ -108,6 +111,13 @@ const Input = React.forwardRef(
 
     return (
       <div className="relative w-full">
+        {prefix && (
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 pointer-events-none select-none text-gray-800 font-semibold text-sm z-10">
+            {Icon && <Icon className="w-4 h-4 text-gray-700 shrink-0" />}
+            <span>{prefix}</span>
+            <span className="text-gray-300">|</span>
+          </div>
+        )}
         <input
           id={generatedId}
           ref={combinedRef}
@@ -116,17 +126,12 @@ const Input = React.forwardRef(
           value={currentValue}
           onChange={handleChange}
           onBlur={handleBlur}
-          placeholder=" "
+          placeholder={placeholder || " "}
           className={cn(
-            "peer block w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 text-sm text-slate-800",
-            "focus:border-[#4f8cff] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#4f8cff]/20 transition-all duration-150",
+            "peer block w-full rounded-md border border-gray-300 bg-white px-3 py-3 text-sm text-black",
+            "focus:border-[#4fb3ff] focus:outline-none focus:ring-1 focus:ring-[#93c5fd] transition-all duration-150",
             "disabled:cursor-not-allowed disabled:opacity-50",
-            "autofill:bg-white autofill:shadow-[inset_0_0_0px_1000px_white]",
-            "[-webkit-text-fill-color:#1e293b]",
-            "[&:-webkit-autofill]:bg-white",
-            "[&:-webkit-autofill]:shadow-[inset_0_0_0px_1000px_white]",
-            "[&:-internal-autofill-selected]:bg-white",
-            "[&:-internal-autofill-selected]:shadow-[inset_0_0_0px_1000px_white]",
+            prefix ? (Icon ? "pl-[76px]" : "pl-16") : "",
             isPassword ? "pr-10" : "",
             className
           )}
@@ -140,18 +145,18 @@ const Input = React.forwardRef(
           <label
             htmlFor={generatedId}
             className={cn(
-              "absolute left-3.5 pointer-events-none transition-all duration-200",
-              "text-slate-400 font-medium",
-              shouldFloatLabel
+              "absolute left-3 pointer-events-none transition-all duration-200",
+              "text-gray-500",
+              (shouldFloatLabel || prefix)
                 ? [
-                    "-top-2.5 text-xs font-semibold text-[#4f8cff]",
-                    "bg-white px-1.5 rounded-sm",
+                    "-top-2 text-xs font-medium text-[#4fb3ff]",
+                    "bg-white px-1",
                   ].join(' ')
                 : [
-                    "top-3 text-xs",
+                    "top-3 text-sm",
                     "bg-transparent"
                   ].join(' '),
-              "peer-focus:-top-2.5 peer-focus:text-xs peer-focus:font-semibold peer-focus:text-[#4f8cff] peer-focus:bg-white peer-focus:px-1.5"
+              "peer-focus:-top-2 peer-focus:text-xs peer-focus:text-[#4fb3ff] peer-focus:bg-white peer-focus:px-1"
             )}
           >
             {label}
@@ -162,7 +167,7 @@ const Input = React.forwardRef(
           <button
             type="button"
             onClick={() => setShowPassword((s) => !s)}
-            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none cursor-pointer"
             tabIndex={-1}
           >
             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
