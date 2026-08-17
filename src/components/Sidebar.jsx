@@ -8,7 +8,6 @@ import {
   ArrowRight,
   Play,
   ClipboardCheck,
-  CalendarCheck,
   Loader,
   Users,
   ChevronDown,
@@ -28,7 +27,6 @@ const navigation = [
     ]
   },
   { name: "Tasks", href: "/tasks", icon: ClipboardCheck },
-  { name: "Daily Check-In", href: "/daily-check-in", icon: CalendarCheck },
   { name: "Spin Wheel", href: "/spin-wheel", icon: Loader },
   { name: "Customers", href: "/customers", icon: Users },
   {
@@ -191,3 +189,4 @@ export function Sidebar({ isOpen, onClose }) {
     </>
   );
 }
+
