@@ -1,7 +1,7 @@
-"use client"
+﻿"use client"
 
 import { useEffect, useState } from "react"
-import { Info, User, Users, Check, Plus, Loader2, Save } from "lucide-react"
+import { Info, User, Users, Check, Loader2, Save } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -38,7 +38,6 @@ export default function CommissionSettingsPage() {
     level1_commission: "0",
     level2_commission: "0",
     level3_commission: "0",
-    level4_commission: "0",
   })
 
   useEffect(() => {
@@ -47,17 +46,16 @@ export default function CommissionSettingsPage() {
         level1_commission: settings.level1_commission || "0",
         level2_commission: settings.level2_commission || "0",
         level3_commission: settings.level3_commission || "0",
-        level4_commission: settings.level4_commission || "0",
       })
     }
   }, [settings])
 
   const handleUpdate = () => {
     updateSettingsMutation.mutate({
-      level1_commission: parseFloat(formData.level1_commission),
-      level2_commission: parseFloat(formData.level2_commission),
-      level3_commission: parseFloat(formData.level3_commission),
-      level4_commission: parseFloat(formData.level4_commission),
+      level1_commission: parseFloat(formData.level1_commission || 0),
+      level2_commission: parseFloat(formData.level2_commission || 0),
+      level3_commission: parseFloat(formData.level3_commission || 0),
+      level4_commission: 0,
     })
   }
 
@@ -80,11 +78,11 @@ export default function CommissionSettingsPage() {
           <div className="bg-blue-50 border border-blue-100 text-blue-800 p-4 rounded-lg mb-8 flex items-center gap-3">
             <Info className="w-5 h-5 flex-shrink-0 text-blue-500" />
             <p className="text-[13px] font-medium text-blue-800">
-              Configure referral commission percentages for 4 levels. Commission is calculated as a percentage of the referred user's investment earnings.
+              Configure referral commission percentages for 3 levels. Commission is calculated as a percentage of the referred user's investment earnings.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <ValidatedInput 
               label="Level 1 Commission (%)" 
               value={formData.level1_commission} 
@@ -108,14 +106,6 @@ export default function CommissionSettingsPage() {
               subText="Third level referrals" 
               icon={Users}
               iconColor="text-purple-600"
-            />
-            <ValidatedInput 
-              label="Level 4 Commission (%)" 
-              value={formData.level4_commission} 
-              onChange={(val) => setFormData(f => ({ ...f, level4_commission: val }))}
-              subText="Fourth level referrals" 
-              icon={Users}
-              iconColor="text-indigo-600"
             />
           </div>
         </CardContent>

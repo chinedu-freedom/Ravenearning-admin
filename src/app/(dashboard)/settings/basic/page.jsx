@@ -11,32 +11,26 @@ import {
   HeadphonesIcon, 
   Settings2, 
   Upload, 
-  Check, 
   Clock, 
-  Percent, 
-  ShieldAlert, 
   Loader2 
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
-import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 
 const basicSettingsSchema = z.object({
   site_name: z.string().min(1, "Site Name is required"),
-  site_title: z.string().min(1, "Site Title is required"),
   currency_name: z.string().min(1, "Currency Name is required"),
   currency_symbol: z.string().min(1, "Currency Symbol is required"),
   timezone: z.string().min(1, "Timezone is required"),
   registration_bonus: z.coerce.number().min(0, "Must be greater than or equal to 0"),
   telegram_support: z.string().optional(),
+  telegram_group: z.string().optional(),
   deposit_notice: z.string().optional(),
   withdrawal_notice: z.string().optional(),
-  auto_withdrawal: z.boolean().default(false),
-  deposit_bonus: z.coerce.number().min(0).default(0),
   daily_withdrawal_limit: z.coerce.number().min(0).default(0),
   min_deposit: z.coerce.number().min(0).default(10),
   max_deposit: z.coerce.number().min(0).default(10000),
@@ -69,16 +63,14 @@ export default function BasicSettingsPage() {
     resolver: zodResolver(basicSettingsSchema),
     defaultValues: {
       site_name: "",
-      site_title: "",
       currency_name: "ZAR",
       currency_symbol: "R",
       timezone: "UTC",
       registration_bonus: 0,
       telegram_support: "",
+      telegram_group: "",
       deposit_notice: "",
       withdrawal_notice: "",
-      auto_withdrawal: false,
-      deposit_bonus: 0,
       daily_withdrawal_limit: 0,
       min_deposit: 10,
       max_deposit: 10000,
@@ -102,16 +94,14 @@ export default function BasicSettingsPage() {
       }
       reset({
         site_name: settingsData.site_name || "",
-        site_title: settingsData.site_title || "",
         currency_name: settingsData.currency_name || "ZAR",
         currency_symbol: settingsData.currency_symbol || "R",
         timezone: settingsData.timezone || "UTC",
         registration_bonus: Number(settingsData.registration_bonus) || 0,
         telegram_support: settingsData.telegram_support || settingsData.telegram_support_link || "",
+        telegram_group: settingsData.telegram_group || settingsData.telegram_group_chat || settingsData.telegram_link || "",
         deposit_notice: settingsData.deposit_notice || "",
         withdrawal_notice: settingsData.withdrawal_notice || "",
-        auto_withdrawal: settingsData.auto_withdrawal ?? false,
-        deposit_bonus: Number(settingsData.deposit_bonus) || 0,
         daily_withdrawal_limit: Number(settingsData.daily_withdrawal_limit) || 0,
         withdrawal_open_time: settingsData.withdrawal_open_time || "",
         withdrawal_close_time: settingsData.withdrawal_close_time || "",
@@ -142,9 +132,11 @@ export default function BasicSettingsPage() {
 
       const payload = {
         ...formData,
+        site_title: formData.site_name,
+        telegram_link: formData.telegram_group,
+        telegram_group_chat: formData.telegram_group,
         platform_logo: base64Logo,
         registration_bonus: Number(formData.registration_bonus),
-        deposit_bonus: Number(formData.deposit_bonus),
         daily_withdrawal_limit: Number(formData.daily_withdrawal_limit),
         min_deposit: Number(formData.min_deposit),
         max_deposit: Number(formData.max_deposit),
@@ -236,7 +228,6 @@ export default function BasicSettingsPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
             <ValidatedInput label="Site Name" name="site_name" register={register} requiredNote={true} />
-            <ValidatedInput label="Site Title" name="site_title" register={register} requiredNote={true} />
             
             <ValidatedInput label="Currency Name" name="currency_name" register={register} requiredNote={true} />
             <ValidatedInput label="Currency Symbol" name="currency_symbol" register={register} requiredNote={true} />
@@ -275,7 +266,7 @@ export default function BasicSettingsPage() {
               <HeadphonesIcon className="w-5 h-5" />
               Contact & Support Links
             </h2>
-            <p className="text-[12px] text-gray-400 mt-1">Configure support contact links displayed on the Help page</p>
+            <p className="text-[12px] text-gray-400 mt-1">Configure support contact and community links displayed on the Help and Service pages</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
@@ -284,6 +275,12 @@ export default function BasicSettingsPage() {
               name="telegram_support"
               register={register}
               subText="Direct link to your Telegram support account for customer inquiries" 
+            />
+            <ValidatedInput 
+              label="Telegram Group Chat" 
+              name="telegram_group"
+              register={register}
+              subText="Telegram group link for community discussions and member interactions" 
             />
             
             <div className="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mt-2">
@@ -306,7 +303,7 @@ export default function BasicSettingsPage() {
         </CardContent>
       </Card>
 
-      {/* Section 3: Deposit & Withdrawal Settings */}
+      {/* Section 3: Withdrawal Settings */}
       <Card className="border-none shadow-sm bg-white rounded-lg">
         <CardContent className="p-8">
           <div className="mb-6">
@@ -314,36 +311,9 @@ export default function BasicSettingsPage() {
               <Settings2 className="w-5 h-5" />
               Deposit & Withdrawal Settings
             </h2>
-            
-            <div className="flex items-start gap-3">
-              <Controller
-                name="auto_withdrawal"
-                control={control}
-                render={({ field }) => (
-                  <Switch 
-                    checked={field.value} 
-                    onCheckedChange={field.onChange}
-                    className="mt-1"
-                  />
-                )}
-              />
-              <div>
-                <label className="text-[13px] font-bold text-gray-700 block mb-0.5">Auto Withdrawal</label>
-                <p className="text-[12px] text-gray-500 leading-relaxed">
-                  If enabled, withdrawals will be automatically processed using the configured automatic gateway. When disabled, all withdrawals will be queued for manual admin approval.
-                </p>
-              </div>
-            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mt-8">
-            <ValidatedInput 
-              label="Deposit Bonus (%)" 
-              name="deposit_bonus"
-              type="number"
-              register={register}
-              subText="Percentage bonus added to user deposits (0 = disabled)" 
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
             <ValidatedInput 
               label="Daily Withdrawal Limit (times)" 
               name="daily_withdrawal_limit"
