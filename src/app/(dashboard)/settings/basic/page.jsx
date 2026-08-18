@@ -177,7 +177,7 @@ export default function BasicSettingsPage() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 pb-12">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 pt-2 pb-12">
       <div>
         <h1 className="text-[1.8rem] font-bold text-gray-800 tracking-tight">Basic Settings</h1>
         <p className="text-[13px] text-gray-500 mt-0.5">Manage your platform details, branding, notices, and operational parameters.</p>
