@@ -90,15 +90,11 @@ export function Sidebar({ isOpen, onClose }) {
 
       <div className={`fixed inset-y-0 left-0 z-50 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:relative lg:translate-x-0 flex h-full w-[260px] flex-col bg-white border-r border-gray-100 shadow-[0_0_20px_0_rgba(0,0,0,0.03)] font-['Poppins',sans-serif] transition-transform duration-300 ease-in-out`}>
         {/* Brand Header */}
-        <div className="flex h-[75px] items-center px-5 border-b border-gray-100">
-          <Link href="/dashboard" className="flex items-center gap-3 w-full group" onClick={handleLinkClick}>
-            <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center bg-gray-50 border border-gray-100 shadow-sm group-hover:scale-105 transition-transform">
-              <img src="/logo.jpeg" alt="Logo" className="w-full h-full object-cover" />
-            </div>
-            <div>
-              <span className="text-[17px] font-bold text-gray-800 tracking-tight block leading-tight">Ravenearning</span>
-              <span className="text-[10px] font-semibold text-[#4f8cff] uppercase tracking-wider block">Admin Panel</span>
-            </div>
+        <div className="flex h-[75px] items-center px-6 border-b border-gray-100">
+          <Link href="/dashboard" className="flex items-center w-full group" onClick={handleLinkClick}>
+            <span className="text-[22px] font-black text-gray-900 tracking-tight hover:text-[#4f8cff] transition-colors">
+              Ravenearning
+            </span>
           </Link>
         </div>
         
@@ -187,4 +183,5 @@ export function Sidebar({ isOpen, onClose }) {
     </>
   );
 }
+
 
