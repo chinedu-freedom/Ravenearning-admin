@@ -53,7 +53,6 @@ const navigation = [
       { name: "Profile", href: "/settings/profile" },
       { name: "Basic", href: "/settings/basic" },
       { name: "Commission", href: "/settings/commission" },
-      { name: "Verification Password", href: "/settings/security" },
     ]
   }
 ];
