@@ -27,7 +27,6 @@ const navigation = [
     ]
   },
   { name: "Tasks", href: "/tasks", icon: ClipboardCheck },
-  { name: "Spin Wheel", href: "/spin-wheel", icon: Loader },
   { name: "Customers", href: "/customers", icon: Users },
   {
     name: "Recharge Payments",
