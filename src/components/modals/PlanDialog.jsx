@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -135,7 +135,7 @@ export default function PlanDialog({ open, setOpen, initialData }) {
         capital_return: false,
         is_fixed_deposit: false,
         status: data.status === "active",
-        image: imagePreview || "https://images.unsplash.com/photo-1592478411213-6153e4ebc07d?auto=format&fit=crop&w=600&q=80",
+        image: imagePreview || "/logo.png",
       };
 
       if (isEdit) {
