@@ -47,7 +47,7 @@ export default function VerificationPasswordTab() {
   }
 
   return (
-    <div className="space-y-6 w-full max-w-2xl font-['Poppins',sans-serif]">
+    <div className="space-y-6 w-full max-w-lg font-['Poppins',sans-serif]">
       <Card className="border border-gray-100 shadow-sm bg-white rounded-xl">
         <CardContent className="p-6 md:p-8 space-y-6">
           <div className="flex items-start gap-3.5 p-4 bg-amber-50 rounded-xl border border-amber-200/80">

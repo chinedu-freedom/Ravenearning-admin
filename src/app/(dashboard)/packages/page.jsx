@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { Search, Edit, Package, Plus, Trash2, Loader2, Sparkles, Calendar, DollarSign } from "lucide-react"
@@ -327,7 +327,7 @@ export default function PlansManagementPage() {
               variant="destructive"
               onClick={executeDelete}
               disabled={deleteMutation.isPending}
-              className="bg-red-600 hover:bg-red-700 font-bold"
+              className="bg-red-600 hover:bg-red-700 text-white font-bold"
             >
               {deleteMutation.isPending ? (
                 <>
