@@ -1,4 +1,4 @@
-import { Poppins } from "next/font/google";
+﻿import { Poppins } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/providers/Providers";
 
@@ -10,29 +10,31 @@ const poppins = Poppins({
 
 export const metadata = {
   metadataBase: new URL("https://ravenearning-admin.vercel.app"),
-  title: "SatrixNow Admin Portal",
-  description: "SatrixNow Administration & Operations Control Center",
+  title: "Ravenearning Admin Portal",
+  description: "Ravenearning Administration & Operations Control Center",
   icons: {
     icon: [
       { url: "/favicon.ico" },
-      { url: "/logo.jpeg", type: "image/jpeg" },
+      { url: "/logo.png", type: "image/png" },
       { url: "/icon.png", type: "image/png" },
     ],
-    shortcut: ["/logo.jpeg"],
+    shortcut: ["/logo.png"],
     apple: [
-      { url: "/logo.jpeg" },
+      { url: "/logo.png" },
       { url: "/apple-icon.png", type: "image/png" },
     ],
   },
   openGraph: {
-    title: "SatrixNow Admin Portal",
-    description: "SatrixNow Administration & Operations Control Center",
-    images: ["/logo.jpeg"],
+    title: "Ravenearning Admin Portal",
+    description: "Ravenearning Administration & Operations Control Center",
+    siteName: "Ravenearning",
+    images: ["/logo.png"],
   },
   twitter: {
     card: "summary",
-    title: "SatrixNow Admin Portal",
-    images: ["/logo.jpeg"],
+    title: "Ravenearning Admin Portal",
+    description: "Ravenearning Administration & Operations Control Center",
+    images: ["/logo.png"],
   },
 };
 
