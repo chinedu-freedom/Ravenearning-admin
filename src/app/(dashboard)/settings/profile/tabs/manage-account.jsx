@@ -1,50 +1,59 @@
 ﻿"use client";
 
-import { useState, useEffect } from "react";
-import { ShieldAlert, KeyRound, Loader2, Save, Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
+import { ShieldAlert, KeyRound, Lock, Loader2, Save, Eye, EyeOff } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useFetchData, usePut } from "@/hooks/useApi";
+import { usePut } from "@/hooks/useApi";
 import { toast } from "sonner";
 
 export default function VerificationPasswordTab() {
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const { data: securityData, isLoading, refetch } = useFetchData("/admin/settings/security", ["admin-security-settings"]);
-  const updatePasswordMutation = usePut("/admin/settings/security", ["admin-security-settings"]);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
 
-  useEffect(() => {
-    if (securityData?.password) {
-      setPassword(securityData.password);
-    }
-  }, [securityData]);
+  const updatePasswordMutation = usePut("/admin/settings/security", ["admin-security-settings"]);
 
   const handleSave = async (e) => {
     e.preventDefault();
-    if (!password) {
-      toast.error("Password cannot be empty");
+
+    if (!currentPassword) {
+      toast.error("Please enter your current verification password");
       return;
     }
+
+    if (!newPassword) {
+      toast.error("Please enter your new verification password");
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      toast.error("New verification password must be at least 6 characters long");
+      return;
+    }
+
+    if (currentPassword === newPassword) {
+      toast.error("New verification password must be different from current password");
+      return;
+    }
+
     try {
-      await updatePasswordMutation.mutateAsync({ password });
-      toast.success("Verification password updated successfully!");
-      refetch();
+      const res = await updatePasswordMutation.mutateAsync({
+        currentPassword,
+        newPassword
+      });
+
+      toast.success(res?.message || "Verification password updated successfully!");
+      setCurrentPassword("");
+      setNewPassword("");
     } catch (err) {
-      toast.error(err?.message || "Failed to update verification password");
+      toast.error(err?.response?.data?.error || err?.message || "Failed to update verification password");
     }
   };
 
   const isSubmitting = updatePasswordMutation.isPending;
-
-  if (isLoading) {
-    return (
-      <div className="min-h-[30vh] flex flex-col items-center justify-center space-y-4">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-        <p className="text-muted-foreground text-sm">Loading security configuration...</p>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6 w-full max-w-lg font-['Poppins',sans-serif]">
@@ -55,34 +64,60 @@ export default function VerificationPasswordTab() {
             <div>
               <h4 className="text-amber-900 font-bold text-sm">Important Security Notice</h4>
               <p className="text-xs text-amber-800/90 mt-1 leading-relaxed">
-                This verification password is required to authorize manual additions or deductions on any customer's main or withdrawable balances. Make sure it is kept confidential.
+                This verification password is required to authorize manual additions or deductions on any customer's main or withdrawable balances. Keep it confidential.
               </p>
             </div>
           </div>
 
-          <form onSubmit={handleSave} className="space-y-5">
+          <form onSubmit={handleSave} className="space-y-5" autoComplete="off">
+            {/* Current Verification Password */}
             <div className="space-y-2">
               <label className="text-[13px] font-bold text-gray-700 flex items-center gap-1.5">
                 <KeyRound className="w-4 h-4 text-blue-500" />
-                Current / New Verification Password
+                Current Verification Password
               </label>
               <div className="relative">
                 <Input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  type={showCurrentPassword ? "text" : "password"}
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  autoComplete="new-password"
                   className="border-gray-200 focus-visible:ring-0 focus-visible:border-blue-500 focus:border-blue-500 h-11 pr-10 text-gray-800 bg-white rounded-lg font-mono text-sm font-semibold"
-                  placeholder="Enter secure verification password"
+                  placeholder="Enter current verification password"
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1"
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-              <p className="text-xs text-muted-foreground">Default password: <span className="font-mono font-semibold text-gray-700">Kr!ptex@77$$</span></p>
+            </div>
+
+            {/* New Verification Password */}
+            <div className="space-y-2">
+              <label className="text-[13px] font-bold text-gray-700 flex items-center gap-1.5">
+                <Lock className="w-4 h-4 text-blue-500" />
+                New Verification Password
+              </label>
+              <div className="relative">
+                <Input
+                  type={showNewPassword ? "text" : "password"}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  autoComplete="new-password"
+                  className="border-gray-200 focus-visible:ring-0 focus-visible:border-blue-500 focus:border-blue-500 h-11 pr-10 text-gray-800 bg-white rounded-lg font-mono text-sm font-semibold"
+                  placeholder="Enter new verification password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1"
+                >
+                  {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
 
             <div className="flex justify-end pt-4 border-t border-gray-100">
