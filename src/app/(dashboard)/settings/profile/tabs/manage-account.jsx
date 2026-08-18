@@ -1,191 +1,112 @@
 ﻿"use client";
 
-import { useState, useEffect, useRef } from "react";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { useState, useEffect } from "react";
+import { ShieldAlert, KeyRound, Loader2, Save, Eye, EyeOff } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useFetchData, usePatch } from "@/hooks/useApi";
-import { Loader2 } from "lucide-react";
-import { useImageSrc } from "@/hooks/useImageSrc";
+import { useFetchData, usePut } from "@/hooks/useApi";
+import { toast } from "sonner";
 
-export default function ManageAccount() {
-  const patchProfile = usePatch("/admin/profile", "profile", false);
-
-  const { data, refetch } = useFetchData(
-    "/admin/profile",
-    "profile"
-  );
-
-  const [form, setForm] = useState({
-    username: "",
-    phone: "",
-    dateOfBirth: "",
-    city: "",
-    postalCode: "",
-    image: null,
-  });
-
-  const imageSrc = useImageSrc(form?.image, "/placeholder-user.jpg");
-
-  const fileInputRef = useRef(null);
+export default function VerificationPasswordTab() {
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const { data: securityData, isLoading, refetch } = useFetchData("/admin/settings/security", ["admin-security-settings"]);
+  const updatePasswordMutation = usePut("/admin/settings/security", ["admin-security-settings"]);
 
   useEffect(() => {
-    if (data?.success && data?.data) {
-      const user = data.data;
-
-      setForm({
-        username: user.username || "",
-        phone: user.phone || "",
-        dateOfBirth: user.dateOfBirth
-          ? new Date(user.dateOfBirth).toISOString().substring(0, 10)
-          : "",
-        city: user.city || "",
-        postalCode: user.postalCode || "",
-        image: user.image || null,
-      });
+    if (securityData?.password) {
+      setPassword(securityData.password);
     }
-  }, [data]);
+  }, [securityData]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setForm((prev) => ({ ...prev, image: reader.result }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleSubmit = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-
-    const payload = {
-      username: form.username,
-      phone: form.phone,
-      dateOfBirth: form.dateOfBirth,
-      city: form.city,
-      postalCode: form.postalCode,
-      image: form.image,
-    };
-
-    patchProfile.mutate(payload, {
-      onSuccess: () => {
-        refetch();
-      },
-    });
+    if (!password) {
+      toast.error("Password cannot be empty");
+      return;
+    }
+    try {
+      await updatePasswordMutation.mutateAsync({ password });
+      toast.success("Verification password updated successfully!");
+      refetch();
+    } catch (err) {
+      toast.error(err?.message || "Failed to update verification password");
+    }
   };
+
+  const isSubmitting = updatePasswordMutation.isPending;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-[30vh] flex flex-col items-center justify-center space-y-4">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+        <p className="text-muted-foreground text-sm">Loading security configuration...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-white border border-gray-150 rounded-lg p-6 shadow-sm w-full md:w-[65%]">
-      <h2 className="text-base text-center font-bold text-gray-800 mb-1">
-        Manage your profile and security settings
-      </h2>
-      <p className="text-sm text-center text-muted-foreground mb-8">
-        Admin Account
-      </p>
-
-      <div className="flex items-center gap-4 mb-6">
-        <div
-          className="relative cursor-pointer"
-          onClick={() => fileInputRef.current?.click()}
-        >
-          <Avatar className="h-16 w-16">
-            <AvatarImage src={imageSrc} alt="Profile photo" />
-            <AvatarFallback>
-              {form.username
-                ? form.username
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .toUpperCase()
-                : "AD"}
-            </AvatarFallback>
-          </Avatar>
-
-          <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center text-white opacity-0 hover:opacity-100 transition">
-            <span className="text-xs font-medium">Change</span>
+    <div className="space-y-6 w-full max-w-2xl font-['Poppins',sans-serif]">
+      <Card className="border border-gray-100 shadow-sm bg-white rounded-xl">
+        <CardContent className="p-6 md:p-8 space-y-6">
+          <div className="flex items-start gap-3.5 p-4 bg-amber-50 rounded-xl border border-amber-200/80">
+            <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+            <div>
+              <h4 className="text-amber-900 font-bold text-sm">Important Security Notice</h4>
+              <p className="text-xs text-amber-800/90 mt-1 leading-relaxed">
+                This verification password is required to authorize manual additions or deductions on any customer's main or withdrawable balances. Make sure it is kept confidential.
+              </p>
+            </div>
           </div>
-        </div>
 
-        <div>
-          <p className="text-sm font-semibold text-gray-700">Profile photo</p>
-          <p className="text-xs text-muted-foreground">
-            Click the avatar to upload a new one.
-          </p>
+          <form onSubmit={handleSave} className="space-y-5">
+            <div className="space-y-2">
+              <label className="text-[13px] font-bold text-gray-700 flex items-center gap-1.5">
+                <KeyRound className="w-4 h-4 text-blue-500" />
+                Current / New Verification Password
+              </label>
+              <div className="relative">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="border-gray-200 focus-visible:ring-0 focus-visible:border-blue-500 focus:border-blue-500 h-11 pr-10 text-gray-800 bg-white rounded-lg font-mono text-sm font-semibold"
+                  placeholder="Enter secure verification password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              <p className="text-xs text-muted-foreground">Default password: <span className="font-mono font-semibold text-gray-700">Kr!ptex@77$$</span></p>
+            </div>
 
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            style={{ display: "none" }}
-          />
-        </div>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input
-            placeholder="Full name"
-            name="username"
-            value={form.username}
-            onChange={handleChange}
-            className="border-gray-200 focus-visible:ring-0 focus-visible:border-blue-500/50 focus:border-blue-500/50 bg-white h-10 text-gray-700 rounded-lg"
-          />
-          <Input
-            placeholder="Phone Number"
-            name="phone"
-            value={form.phone}
-            onChange={handleChange}
-            className="border-gray-200 focus-visible:ring-0 focus-visible:border-blue-500/50 focus:border-blue-500/50 bg-white h-10 text-gray-700 rounded-lg"
-          />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input
-            placeholder="Date of Birth"
-            name="dateOfBirth"
-            type="date"
-            value={form.dateOfBirth}
-            onChange={handleChange}
-            className="border-gray-200 focus-visible:ring-0 focus-visible:border-blue-500/50 focus:border-blue-500/50 bg-white h-10 text-gray-700 rounded-lg"
-          />
-          <Input
-            placeholder="City"
-            name="city"
-            value={form.city}
-            onChange={handleChange}
-            className="border-gray-200 focus-visible:ring-0 focus-visible:border-blue-500/50 focus:border-blue-500/50 bg-white h-10 text-gray-700 rounded-lg"
-          />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input
-            placeholder="Postal code"
-            name="postalCode"
-            value={form.postalCode}
-            onChange={handleChange}
-            className="border-gray-200 focus-visible:ring-0 focus-visible:border-blue-500/50 focus:border-blue-500/50 bg-white h-10 text-gray-700 rounded-lg"
-          />
-        </div>
-
-        <Button
-          type="submit"
-          className="mt-4 bg-blue-600 hover:bg-blue-700 text-white min-w-[140px] rounded-lg shadow-sm border-0 flex items-center justify-center gap-2 font-bold h-10"
-          disabled={patchProfile.isPending}
-        >
-          {patchProfile.isPending ? "Saving" : "Save Changes"}
-          {patchProfile.isPending && (
-            <Loader2 className="w-5 h-5 animate-spin text-white" />
-          )}
-        </Button>
-      </form>
+            <div className="flex justify-end pt-4 border-t border-gray-100">
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="bg-[#4f8cff] hover:bg-[#3b7bed] text-white px-6 h-10 font-bold rounded-lg shadow-sm border-0 flex items-center justify-center gap-2 text-xs"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4" />
+                    Save Verification Password
+                  </>
+                )}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }
