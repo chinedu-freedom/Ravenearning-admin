@@ -87,7 +87,7 @@ export default function PendingWithdrawPage() {
     sn: index + 1,
     userInfo: {
       name: w.user?.full_name || "Unknown",
-      username: w.user?.phone || w.user?.username || "Unknown"
+      phone: w.user?.phone || "Unknown"
     },
     withdrawInfo: {
       method: w.network || w.withdrawal_method || "Crypto",
@@ -107,7 +107,7 @@ export default function PendingWithdrawPage() {
     const searchLower = searchTerm.toLowerCase()
     return (
       item.userInfo?.name?.toLowerCase().includes(searchLower) ||
-      item.userInfo?.username?.toLowerCase().includes(searchLower) ||
+      item.userInfo?.phone?.toLowerCase().includes(searchLower) ||
       item.withdrawInfo?.transactionId?.toLowerCase().includes(searchLower)
     )
   })
@@ -130,7 +130,7 @@ export default function PendingWithdrawPage() {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10 pointer-events-none" />
                 <Input
-                  placeholder="Search by name, username or transaction id..."
+                  placeholder="Search by phone number or transaction ID..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-9 bg-white border-gray-200 h-10 w-full"
@@ -176,7 +176,7 @@ export default function PendingWithdrawPage() {
                         <div className="flex flex-col space-y-1.5">
                           <div className="text-[13px] text-gray-700">
                             Phone Number: <br />
-                            <span className="font-medium">{item.userInfo.username}</span>
+                            <span className="font-medium">{item.userInfo.phone}</span>
                           </div>
                         </div>
                       </TableCell>

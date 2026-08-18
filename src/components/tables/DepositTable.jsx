@@ -244,7 +244,7 @@ export default function DepositTable({ searchTerm = "", statusFilter = "all" }) 
                       {dep._id || "N/A"}
                     </TableCell>
                     <TableCell className="truncate max-w-[200px] whitespace-nowrap">
-                      {dep.user?.phone || dep.user?.username || "N/A"}
+                      {dep.user?.phone || "N/A"}
                     </TableCell>
                     <TableCell className="whitespace-nowrap text-gray-900">
                       {formatCurrency(dep.amount)}
@@ -365,7 +365,7 @@ export default function DepositTable({ searchTerm = "", statusFilter = "all" }) 
           <p className="text-sm text-gray-600">
             Are you sure you want to delete{" "}
             <span className="font-semibold">
-              {depositToDelete?.user?.username || "this deposit"}
+              {depositToDelete?.user?.phone || "this deposit"}
             </span>
             's deposit record? This action cannot be undone.
           </p>

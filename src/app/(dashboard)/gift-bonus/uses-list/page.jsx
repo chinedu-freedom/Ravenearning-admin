@@ -20,7 +20,7 @@ export default function BonusUsesListPage() {
   const filteredData = usesData.filter((item) => {
     const matchesSearch = 
       (item.user?.full_name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (item.user?.phone || item.user?.username || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.user?.phone || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
       (item.gift_code?.code || "").toLowerCase().includes(searchTerm.toLowerCase())
     
     // Gift code claims are successful once they are created

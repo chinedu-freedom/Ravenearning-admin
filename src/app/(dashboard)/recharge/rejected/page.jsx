@@ -82,7 +82,7 @@ export default function RejectedRechargePage() {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10 pointer-events-none" />
                 <Input
-                  placeholder="Search by name, username, payment number or transaction id..."
+                  placeholder="Search by phone number, payment number, or transaction ID..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-9 bg-white border-gray-200 h-10 w-full"
@@ -128,7 +128,7 @@ export default function RejectedRechargePage() {
                         <div className="flex flex-col space-y-1.5">
                           <div className="text-[13px] text-gray-700">
                             Phone Number: <br />
-                            <span className="font-medium">{item.userInfo.username}</span>
+                            <span className="font-medium">{item.userInfo.phone}</span>
                           </div>
                           <div className="text-[13px] text-gray-700">
                             Ref_id: <span className="font-medium">{item.userInfo.refId}</span>

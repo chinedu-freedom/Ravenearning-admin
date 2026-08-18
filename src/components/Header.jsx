@@ -12,8 +12,8 @@ export function Header({ onMenuClick }) {
   const admin = data?.success && data?.data ? data.data : null;
   const siteLogo = settingsData?.settings?.platform_logo;
 
-  const displayName = admin?.username || admin?.phone || "Admin";
-  const avatarLetter = (admin?.username ? admin.username[0] : (admin?.phone ? admin.phone[0] : "A")).toUpperCase();
+  const displayName = admin?.phone || "Admin";
+  const avatarLetter = (admin?.phone ? admin.phone[0] : "A").toUpperCase();
 
   return (
     <header className="h-[65px] flex items-center justify-between px-6 bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-20 font-['Poppins',sans-serif]">

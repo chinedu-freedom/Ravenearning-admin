@@ -228,7 +228,7 @@ export default function WithdrawalTable({ searchTerm = "", statusFilter = "all" 
                       {txn._id || "N/A"}
                     </TableCell>
                     <TableCell className="truncate max-w-[200px] whitespace-nowrap">
-                      {txn.user?.phone || txn.user?.username || "N/A"}
+                      {txn.user?.phone || "N/A"}
                     </TableCell>
                     <TableCell className="whitespace-nowrap font-semibold text-gray-500">{symbol}{txn.amount?.toLocaleString()}</TableCell>
                     <TableCell className="whitespace-nowrap font-medium text-red-500">-{symbol}{txn.fee ? txn.fee.toLocaleString() : (txn.amount * 0.06).toLocaleString()}</TableCell>
@@ -349,7 +349,7 @@ export default function WithdrawalTable({ searchTerm = "", statusFilter = "all" 
           <p className="text-sm text-gray-600">
             Are you sure you want to delete{" "}
             <span className="font-semibold">
-              {transactionToDelete?.user?.username || "this transaction"}
+              {transactionToDelete?.user?.phone || "this transaction"}
             </span>
             's withdrawal record? This action cannot be undone.
           </p>

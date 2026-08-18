@@ -152,7 +152,7 @@ export default function UsersTable({ searchTerm = "" }) {
 
   const handleEditPhoneClick = (user) => {
     setuserToEditPhone(user);
-    setnewPhone(user.phone || user.username || "");
+    setnewPhone(user.phone || "");
     setisEditPhoneOpen(true);
     setOpenMenuId(null);
   };
@@ -208,7 +208,7 @@ export default function UsersTable({ searchTerm = "" }) {
                     {user._id}
                   </TableCell>
 
-                  <TableCell className="whitespace-nowrap">{user.phone || user.username}</TableCell>
+                  <TableCell className="whitespace-nowrap">{user.phone}</TableCell>
 
                   <TableCell>
                     <Badge className={getStatusColor(user.accountStatus)}>
@@ -397,9 +397,9 @@ export default function UsersTable({ searchTerm = "" }) {
           </p>
 
           <div className="grid gap-2 py-4">
-            <Label htmlFor="new-email">New Phone Number</Label>
+            <Label htmlFor="new-phone">New Phone Number</Label>
             <Input
-              id="new-email"
+              id="new-phone"
               type="text"
               placeholder="Enter new phone number"
               value={newPhone}

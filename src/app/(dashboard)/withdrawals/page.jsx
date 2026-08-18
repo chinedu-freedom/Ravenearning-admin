@@ -136,7 +136,7 @@ export default function WithdrawalsPage() {
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input 
               type="text" 
-              placeholder="Search ID, User or Address..." 
+              placeholder="Search by phone number or transaction ID..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="bg-white border border-gray-200 rounded-xl py-2 pl-9 pr-4 text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none focus:border-blue-500/50 w-full sm:w-64 transition-all shadow-sm"
