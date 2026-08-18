@@ -11,7 +11,7 @@ import {
   WalletCards, 
   Save, 
   Trash, 
-  LogIn, 
+ 
   PlusCircle, 
   MinusCircle, 
   AlertTriangle,
@@ -67,7 +67,6 @@ export default function CustomerDetailPage() {
   const [isSaving, setIsSaving] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const deletingRef = useRef(false)
-  const [isImpersonating, setIsImpersonating] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [showSaveConfirm, setShowSaveConfirm] = useState(false)
 
@@ -165,29 +164,7 @@ export default function CustomerDetailPage() {
     }
   }
 
-  const handleImpersonate = async () => {
-    setIsImpersonating(true)
-    try {
-      const token = document.cookie.split("; ").find(row => row.startsWith("sec-admin-token="))?.split("=")[1];
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/admin/users/${id}/impersonate`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      })
-      const data = await res.json()
-      if (res.ok && data.token) {
-        toast.success(`Logging in as ${user.phone || "user"}...`)
-        window.open(`http://localhost:3000?impersonate_token=${data.token}`, "_blank")
-      } else {
-        toast.error(data.error || "Failed to impersonate user")
-      }
-    } catch (error) {
-      toast.error("Failed to impersonate user")
-    } finally {
-      setIsImpersonating(false)
-    }
-  }
+
 
   const handleTriggerFinance = (type) => {
     const data = type === 'credit' ? creditData : debitData;
@@ -280,15 +257,7 @@ export default function CustomerDetailPage() {
 
         {/* Global Action Buttons */}
         <div className="flex items-center gap-2 flex-wrap">
-          <Button 
-            onClick={handleImpersonate}
-            disabled={isImpersonating}
-            variant="outline" 
-            className="border-border bg-card hover:bg-muted text-cyan-600 gap-2 h-9 text-xs font-semibold"
-          >
-            {isImpersonating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <LogIn className="w-3.5 h-3.5" />}
-            Login As User
-          </Button>
+
 
           <Button 
             onClick={() => setShowDeleteConfirm(true)}
