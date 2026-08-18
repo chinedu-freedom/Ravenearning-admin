@@ -340,10 +340,7 @@ export default function CustomerDetailPage() {
                 <span className="text-muted-foreground flex items-center gap-2"><Clock className="w-3.5 h-3.5" /> Last Login</span>
                 <span className="font-medium text-foreground">{safeFormatDate(user.last_login, "MMM dd, HH:mm")}</span>
               </div>
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
-                <span className="text-muted-foreground flex items-center gap-2"><MapPin className="w-3.5 h-3.5" /> IP Address</span>
-                <span className="font-medium text-foreground">{user.last_ip === "::1" ? "127.0.0.1 (Local)" : (user.last_ip || "Unknown")}</span>
-              </div>
+
             </div>
           </div>
 
