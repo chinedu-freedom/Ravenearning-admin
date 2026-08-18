@@ -22,7 +22,9 @@ import {
   Clock,
   MapPin,
   Hash,
-  Loader2
+  Loader2,
+  Eye,
+  EyeOff
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -77,6 +79,9 @@ export default function CustomerDetailPage() {
   const [isCreditProcessing, setIsCreditProcessing] = useState(false)
   const [isDebitProcessing, setIsDebitProcessing] = useState(false)
   const [securityModal, setSecurityModal] = useState({ isOpen: false, actionType: "", password: "" })
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showNewWithdrawalPin, setShowNewWithdrawalPin] = useState(false)
+  const [showAdminPassword, setShowAdminPassword] = useState(false)
 
   useEffect(() => {
     if (user && !user.error && !editData && !isLoading) {
@@ -372,11 +377,41 @@ export default function CustomerDetailPage() {
                 </div>
                 <div className="space-y-2">
                   <Label className="text-foreground flex items-center gap-2"><Lock className="w-4 h-4" /> Reset Login Password</Label>
-                  <Input type="password" placeholder="Leave blank to keep current" value={editData.new_password} onChange={(e) => setEditData({ ...editData, new_password: e.target.value })} className="bg-background border-border text-foreground h-10" />
+                  <div className="relative">
+                    <Input 
+                      type={showNewPassword ? "text" : "password"} 
+                      placeholder="Leave blank to keep current" 
+                      value={editData.new_password} 
+                      onChange={(e) => setEditData({ ...editData, new_password: e.target.value })} 
+                      className="bg-background border-border text-foreground h-10 pr-10" 
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer transition-colors p-1"
+                    >
+                      {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label className="text-foreground flex items-center gap-2"><KeyRound className="w-4 h-4 text-blue-500" /> Reset Withdrawal PIN</Label>
-                  <Input type="password" placeholder="Leave blank to keep current" value={editData.new_withdrawal_pin} onChange={(e) => setEditData({ ...editData, new_withdrawal_pin: e.target.value })} className="bg-background border-border text-foreground h-10" />
+                  <div className="relative">
+                    <Input 
+                      type={showNewWithdrawalPin ? "text" : "password"} 
+                      placeholder="Leave blank to keep current" 
+                      value={editData.new_withdrawal_pin} 
+                      onChange={(e) => setEditData({ ...editData, new_withdrawal_pin: e.target.value })} 
+                      className="bg-background border-border text-foreground h-10 pr-10" 
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewWithdrawalPin(!showNewWithdrawalPin)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer transition-colors p-1"
+                    >
+                      {showNewWithdrawalPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -706,18 +741,27 @@ export default function CustomerDetailPage() {
             </p>
             <div className="space-y-2">
               <Label htmlFor="admin-password">Enter Admin Password</Label>
-              <Input
-                id="admin-password"
-                type="password"
-                placeholder="Enter your password to confirm"
-                value={securityModal.password}
-                onChange={(e) => setSecurityModal(prev => ({ ...prev, password: e.target.value }))}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleConfirmProcessFinance();
-                }}
-                className="bg-background border-border text-foreground"
-                autoFocus
-              />
+              <div className="relative">
+                <Input
+                  id="admin-password"
+                  type={showAdminPassword ? "text" : "password"}
+                  placeholder="Enter your password to confirm"
+                  value={securityModal.password}
+                  onChange={(e) => setSecurityModal(prev => ({ ...prev, password: e.target.value }))}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleConfirmProcessFinance();
+                  }}
+                  className="bg-background border-border text-foreground pr-10"
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowAdminPassword(!showAdminPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer transition-colors p-1"
+                >
+                  {showAdminPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
           </div>
           <div className="flex justify-end gap-3 mt-4">
