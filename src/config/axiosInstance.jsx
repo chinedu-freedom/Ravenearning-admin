@@ -1,10 +1,10 @@
-"use client";
+﻿"use client";
 
 import axios from "axios";
 import { CookieManager } from "@/utils/cookie-utils";
 
-// ✅ Use correct env variable
-export const API_URL = process.env.NEXT_PUBLIC_BASE_URL;
+// âœ… Use correct env variable
+export const API_URL = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
 
 const axiosInstance = axios.create({
   baseURL: API_URL,

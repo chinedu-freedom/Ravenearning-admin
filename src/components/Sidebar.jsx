@@ -90,9 +90,9 @@ export function Sidebar({ isOpen, onClose }) {
 
       <div className={`fixed inset-y-0 left-0 z-50 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:relative lg:translate-x-0 flex h-full w-[260px] flex-col bg-white border-r border-gray-100 shadow-[0_0_20px_0_rgba(0,0,0,0.03)] font-['Poppins',sans-serif] transition-transform duration-300 ease-in-out`}>
         {/* Brand Header */}
-        <div className="flex h-[75px] items-center px-6 border-b border-gray-100">
+        <div className="flex h-[65px] items-center px-6 border-b border-gray-100">
           <Link href="/dashboard" className="flex items-center w-full group" onClick={handleLinkClick}>
-            <span className="text-[22px] font-black text-gray-900 tracking-tight hover:text-[#4f8cff] transition-colors">
+            <span className="text-[28px] font-black text-gray-900 tracking-tight hover:text-[#4f8cff] transition-colors">
               Ravenearning
             </span>
           </Link>
