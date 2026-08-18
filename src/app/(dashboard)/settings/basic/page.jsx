@@ -75,9 +75,9 @@ export default function BasicSettingsPage() {
       min_deposit: 10,
       max_deposit: 10000,
       deposit_charge: 0,
-      min_withdrawal: 10,
+      min_withdrawal: 100,
       max_withdrawal: 10000,
-      withdrawal_charge: 2,
+      withdrawal_charge: 15,
       withdrawal_open_time: "",
       withdrawal_close_time: "",
       require_investment_to_withdraw: false,
@@ -107,9 +107,9 @@ export default function BasicSettingsPage() {
         withdrawal_close_time: settingsData.withdrawal_close_time || "",
         require_investment_to_withdraw: settingsData.require_investment_to_withdraw ?? false,
         min_investment_to_withdraw: settingsData.min_investment_to_withdraw || 1,
-        min_withdrawal: Number(settingsData.min_withdrawal) || 10,
+        min_withdrawal: Number(settingsData.min_withdrawal) || 100,
         max_withdrawal: Number(settingsData.max_withdrawal) || 10000,
-        withdrawal_charge: Number(settingsData.withdrawal_charge) || 2,
+        withdrawal_charge: Number(settingsData.withdrawal_charge) || 15,
         max_deposit: Number(settingsData.max_deposit) || 10000,
         min_deposit: Number(settingsData.min_deposit) || 10,
         deposit_charge: Number(settingsData.deposit_charge) || 0
@@ -468,3 +468,4 @@ function RichTextEditor({ label, name, control }) {
     </div>
   )
 }
+
