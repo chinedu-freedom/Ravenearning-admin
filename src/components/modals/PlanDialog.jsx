@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -17,14 +17,14 @@ import { Loader2, Camera, Sparkles } from "lucide-react";
 import { usePost, usePut } from "@/hooks/useApi";
 import { useQueryClient } from "@tanstack/react-query";
 import { Switch } from "@/components/ui/switch";
-import { toast } from "sonner";
 
 const planSchema = z.object({
   title: z.string().min(2, "Product name is required"),
   description: z.string().optional(),
   price: z.coerce.number().min(1, "Price must be at least 1"),
   duration: z.coerce.number().min(1, "Duration must be at least 1 day"),
-  dailyReturn: z.coerce.number().min(0.01, "Daily return % is required"),
+  dailyIncomeZar: z.coerce.number().min(0.01, "Daily income is required"),
+  totalRevenueZar: z.coerce.number().min(0.01, "Total revenue is required"),
   status: z.enum(["active", "inactive"]),
 });
 
@@ -34,7 +34,6 @@ export default function PlanDialog({ open, setOpen, initialData }) {
   const fileInputRef = useRef(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [imageName, setImageName] = useState("");
-  const [dailyIncomeInput, setDailyIncomeInput] = useState("");
 
   const {
     register,
@@ -50,53 +49,42 @@ export default function PlanDialog({ open, setOpen, initialData }) {
       description: "",
       price: 300,
       duration: 180,
-      dailyReturn: 25,
+      dailyIncomeZar: 78,
+      totalRevenueZar: 14040,
       status: "active",
     },
   });
 
-  const price = watch("price") || 0;
-  const duration = watch("duration") || 0;
-  const dailyReturn = watch("dailyReturn") || 0;
+  const duration = watch("duration");
+  const dailyIncomeZar = watch("dailyIncomeZar");
   const status = watch("status");
 
-  // Calculated daily income & total revenue
-  const dailyIncomeAmount = price > 0 && dailyReturn > 0 ? (price * dailyReturn) / 100 : 0;
-  const totalRevenue = dailyIncomeAmount * duration;
-
-  // Handle manual Daily Income (ZAR) change
-  const handleDailyIncomeChange = (e) => {
-    const val = e.target.value;
-    setDailyIncomeInput(val);
-    const numVal = parseFloat(val);
-    if (!isNaN(numVal) && price > 0) {
-      const calculatedPercent = (numVal / price) * 100;
-      setValue("dailyReturn", parseFloat(calculatedPercent.toFixed(4)), { shouldValidate: true });
-    }
-  };
-
-  // Keep daily income input in sync when price or dailyReturn changes
   useEffect(() => {
-    if (price > 0 && dailyReturn > 0) {
-      setDailyIncomeInput(((price * dailyReturn) / 100).toFixed(2));
+    if (duration > 0 && dailyIncomeZar > 0) {
+      const calculatedTotal = Number((dailyIncomeZar * duration).toFixed(2));
+      setValue("totalRevenueZar", calculatedTotal);
     }
-  }, [price, dailyReturn]);
+  }, [duration, dailyIncomeZar, setValue]);
 
-  // Populate form when editing
   useEffect(() => {
     if (initialData) {
       const planPrice = initialData.min_investment ? Number(initialData.min_investment) : 300;
-      const planDailyPercent = initialData.daily_income ? Number(initialData.daily_income) : 25;
-      
+      const durationDays = initialData.duration ? Number(initialData.duration) : 180;
+      let dailyZar = initialData.daily_income ? Number(initialData.daily_income) : 78;
+      if (dailyZar <= 1) {
+        dailyZar = Number((planPrice * dailyZar).toFixed(2));
+      }
+      const totalRev = initialData.total_revenue ? Number(initialData.total_revenue) : Number((dailyZar * durationDays).toFixed(2));
+
       reset({
         title: initialData.name || "",
         description: initialData.description || "",
         price: planPrice,
-        duration: initialData.duration || 180,
-        dailyReturn: planDailyPercent,
+        duration: durationDays,
+        dailyIncomeZar: dailyZar,
+        totalRevenueZar: totalRev,
         status: initialData.status ? "active" : "inactive",
       });
-      setDailyIncomeInput(((planPrice * planDailyPercent) / 100).toFixed(2));
       setImagePreview(initialData.image || null);
       setImageName(initialData.image ? "Current Image" : "");
     } else {
@@ -105,19 +93,18 @@ export default function PlanDialog({ open, setOpen, initialData }) {
         description: "",
         price: 300,
         duration: 180,
-        dailyReturn: 25,
+        dailyIncomeZar: 78,
+        totalRevenueZar: 14040,
         status: "active",
       });
-      setDailyIncomeInput("75.00");
       setImagePreview(null);
       setImageName("");
     }
   }, [initialData, reset, open]);
 
-  // API mutations
   const createPlanMutation = usePost("/admin/plans", ["plans"]);
   const updatePlanMutation = usePut(
-    initialData?.id ? `/admin/plans/${initialData.id}` : null,
+    initialData?.id ? "/admin/plans/" + initialData.id : null,
     ["plans"]
   );
 
@@ -127,9 +114,10 @@ export default function PlanDialog({ open, setOpen, initialData }) {
     try {
       const payload = {
         name: data.title,
-        description: data.description || `${data.title} VIP Projector`,
+        description: data.description || (data.title + " Investment Plan"),
         duration: Number(data.duration),
-        daily_income: Number(data.dailyReturn),
+        daily_income: Number(data.dailyIncomeZar),
+        total_revenue: Number(data.totalRevenueZar),
         min_investment: Number(data.price),
         max_investment: Number(data.price),
         capital_return: false,
@@ -137,77 +125,73 @@ export default function PlanDialog({ open, setOpen, initialData }) {
         status: data.status === "active",
         image: imagePreview || "/logo.png",
       };
-
+      
       if (isEdit) {
         await updatePlanMutation.mutateAsync(payload);
-        toast.success("Plan updated successfully!");
       } else {
         await createPlanMutation.mutateAsync(payload);
-        toast.success("Plan created successfully!");
       }
-
-      queryClient.invalidateQueries({ queryKey: ["plans"] });
+      queryClient.invalidateQueries(["plans"]);
       setOpen(false);
     } catch (error) {
-      console.error("Plan submit error:", error);
-      toast.error(error?.response?.data?.error || "Failed to save plan");
+      // Toasts are automatically handled by useApi hook (single toast)
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-w-2xl bg-white p-0 overflow-hidden font-['Poppins',sans-serif] max-h-[90vh] flex flex-col">
-        <DialogHeader className="p-6 pb-4 border-b border-gray-100 bg-slate-50/50 shrink-0">
-          <DialogTitle className="text-xl font-bold text-gray-800 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-[#4f8cff]" />
-            {isEdit ? "Edit VIP Package" : "Create VIP Package"}
-          </DialogTitle>
-          <p className="text-xs text-gray-500 mt-1">
-            Configure product price, daily revenue, and investment term for Raven products.
-          </p>
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto bg-slate-50 p-6 rounded-2xl">
+        <DialogHeader className="pb-4 border-b border-gray-100">
+          <div className="flex items-center gap-2">
+            <div className="p-2 bg-blue-50 rounded-lg text-[#4f8cff]">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div>
+              <DialogTitle className="text-lg font-bold text-gray-900">
+                {isEdit ? "Edit VIP Package" : "Create VIP Package"}
+              </DialogTitle>
+              <p className="text-xs text-gray-500">Set exact package price, daily earnings, total revenue, and duration</p>
+            </div>
+          </div>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6 overflow-y-auto flex-1">
-          {/* Basic Info */}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 pt-4">
           <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-xs space-y-4">
-            <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide">Product Details</h3>
+            <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide">Package Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label className="text-gray-700 text-xs font-semibold mb-1.5 block">Product Name</Label>
+                <Label className="text-gray-700 text-xs font-semibold mb-1.5 block">Package / Product Name</Label>
                 <Input
                   {...register("title")}
-                  placeholder="e.g. Raven Z6X, Raven H6 Max"
-                  className="border-gray-200 focus-visible:ring-[#4f8cff] h-10 rounded-lg text-sm"
+                  placeholder="e.g. VIP1, VIP2, VIP3"
+                  className="border-gray-200 focus-visible:ring-[#4f8cff] h-10 rounded-lg text-sm font-medium"
                 />
                 {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title.message}</p>}
               </div>
-
               <div>
-                <Label className="text-gray-700 text-xs font-semibold mb-1.5 block">Price (ZAR)</Label>
+                <Label className="text-gray-700 text-xs font-semibold mb-1.5 block">Package Price (ZAR)</Label>
                 <Input
                   type="number"
                   step="any"
                   {...register("price")}
-                  placeholder="e.g. 300, 800, 1500"
+                  placeholder="e.g. 300, 700, 1500"
                   className="border-gray-200 focus-visible:ring-[#4f8cff] h-10 rounded-lg text-sm font-bold text-[#2563eb]"
                 />
                 {errors.price && <p className="text-red-500 text-xs mt-1">{errors.price.message}</p>}
               </div>
-
               <div className="md:col-span-2">
                 <Label className="text-gray-700 text-xs font-semibold mb-1.5 block">Description / Subtitle</Label>
                 <Input
                   {...register("description")}
-                  placeholder="e.g. VIP1 Smart Home Theater Projector"
+                  placeholder="e.g. VIP1 Smart Projector Package"
                   className="border-gray-200 focus-visible:ring-[#4f8cff] h-10 rounded-lg text-sm"
                 />
               </div>
             </div>
           </div>
 
-          {/* Revenue & Term Settings */}
           <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-xs space-y-4">
-            <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide">Income & Term Configuration</h3>
+            <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide">Income & Term Direct Inputs</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <Label className="text-gray-700 text-xs font-semibold mb-1.5 block">Duration (Days)</Label>
@@ -219,68 +203,45 @@ export default function PlanDialog({ open, setOpen, initialData }) {
                 />
                 {errors.duration && <p className="text-red-500 text-xs mt-1">{errors.duration.message}</p>}
               </div>
-
               <div>
                 <Label className="text-gray-700 text-xs font-semibold mb-1.5 block">Daily Income (ZAR)</Label>
                 <Input
                   type="number"
                   step="any"
-                  value={dailyIncomeInput}
-                  onChange={handleDailyIncomeChange}
-                  placeholder="e.g. 75"
+                  {...register("dailyIncomeZar")}
+                  placeholder="e.g. 78"
                   className="border-gray-200 focus-visible:ring-[#4f8cff] h-10 rounded-lg text-sm font-bold text-emerald-600"
                 />
-                <p className="text-[10.5px] text-gray-400 mt-1">Daily cash payout amount</p>
+                {errors.dailyIncomeZar && <p className="text-red-500 text-xs mt-1">{errors.dailyIncomeZar.message}</p>}
+                <p className="text-[10.5px] text-gray-400 mt-1">Exact cash payout per day</p>
               </div>
-
               <div>
-                <Label className="text-gray-700 text-xs font-semibold mb-1.5 block">Daily Return (%)</Label>
+                <Label className="text-gray-700 text-xs font-semibold mb-1.5 block">Total Revenue (ZAR)</Label>
                 <Input
                   type="number"
-                  step="0.01"
-                  {...register("dailyReturn")}
-                  placeholder="e.g. 25"
-                  className="border-gray-200 focus-visible:ring-[#4f8cff] h-10 rounded-lg text-sm font-bold text-blue-600"
+                  step="any"
+                  {...register("totalRevenueZar")}
+                  placeholder="e.g. 14040"
+                  className="border-gray-200 focus-visible:ring-[#4f8cff] h-10 rounded-lg text-sm font-bold text-[#2563eb]"
                 />
-                <p className="text-[10.5px] text-gray-400 mt-1">Calculated % per day</p>
-              </div>
-            </div>
-
-            {/* Total Return Preview Banner */}
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-4 flex items-center justify-between">
-              <div>
-                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider block">Estimated Total Revenue</span>
-                <span className="text-xl font-black text-[#2563eb]">
-                  ZAR {Number(totalRevenue || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </span>
-              </div>
-              <div className="text-right">
-                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider block">Total Yield</span>
-                <span className="text-base font-extrabold text-emerald-600">
-                  +{((dailyReturn * duration) || 0).toFixed(0)}%
-                </span>
+                {errors.totalRevenueZar && <p className="text-red-500 text-xs mt-1">{errors.totalRevenueZar.message}</p>}
+                <p className="text-[10.5px] text-gray-400 mt-1">Total cash revenue over duration</p>
               </div>
             </div>
           </div>
 
-          {/* Product Image */}
           <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-xs space-y-4">
             <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide">Product Image</h3>
             <div className="flex items-center gap-4">
               <div className="flex-1">
-                <Label className="text-gray-700 text-xs font-semibold mb-1.5 block">
-                  Upload / Image URL
-                </Label>
+                <Label className="text-gray-700 text-xs font-semibold mb-1.5 block">Upload / Image URL</Label>
                 <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
-                  <Input 
-                    type="text" 
-                    placeholder="Choose file or enter image URL" 
+                  <Input
+                    type="text"
+                    placeholder="Choose file or enter image URL"
                     value={imageName || (imagePreview ? "Image Selected" : "")}
-                    onChange={(e) => {
-                      setImagePreview(e.target.value);
-                      setImageName(e.target.value);
-                    }}
-                    className="border-0 bg-transparent flex-1 h-10 text-xs" 
+                    onChange={(e) => { setImagePreview(e.target.value); setImageName(e.target.value); }}
+                    className="border-0 bg-transparent flex-1 h-10 text-xs"
                   />
                   <input
                     type="file"
@@ -292,16 +253,14 @@ export default function PlanDialog({ open, setOpen, initialData }) {
                       if (file) {
                         setImageName(file.name);
                         const reader = new FileReader();
-                        reader.onloadend = () => {
-                          setImagePreview(reader.result);
-                        };
+                        reader.onloadend = () => { setImagePreview(reader.result); };
                         reader.readAsDataURL(file);
                       }
                     }}
                   />
-                  <Button 
-                    type="button" 
-                    variant="secondary" 
+                  <Button
+                    type="button"
+                    variant="secondary"
                     className="border-l rounded-none h-10 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium"
                     onClick={() => fileInputRef.current?.click()}
                   >
@@ -319,7 +278,6 @@ export default function PlanDialog({ open, setOpen, initialData }) {
             </div>
           </div>
 
-          {/* Status Switch */}
           <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-xs flex items-center justify-between">
             <div>
               <Label className="text-gray-800 text-sm font-bold block">Active Status</Label>
@@ -332,7 +290,6 @@ export default function PlanDialog({ open, setOpen, initialData }) {
             />
           </div>
 
-          {/* Footer Submit Button */}
           <div className="flex justify-end gap-3 pt-2">
             <Button
               type="button"

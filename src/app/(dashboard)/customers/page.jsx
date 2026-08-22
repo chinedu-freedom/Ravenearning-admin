@@ -1,77 +1,48 @@
-﻿"use client"
+"use client"
 
 import { useState } from "react"
-import Link from "next/link"
-import { format } from "date-fns"
-import { 
-  Users, 
-  UserCheck, 
-  UserX, 
-  Search, 
-  Edit, 
-  Trash2, 
-  AlertTriangle,
-  Loader2,
-  Phone
-} from "lucide-react"
-
+import { useFetchData, useDelete } from "@/hooks/useApi"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { StatusBadge } from "@/components/ui/status-badge"
-import { useFetchData, useDelete } from "@/hooks/useApi"
+import { Badge } from "@/components/ui/badge"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog"
+import { Search, Eye, Trash2, Users, Shield, Loader2, Calendar } from "lucide-react"
+import Link from "next/link"
 import { toast } from "sonner"
+import { format } from "date-fns"
 
 export default function CustomersPage() {
   const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all-status")
   const [userToDelete, setUserToDelete] = useState(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
-  // Fetch Users
-  const { data: usersResponse, isLoading, refetch } = useFetchData("/admin/users", ["admin-users"])
+  const { data: usersRes, isLoading, refetch } = useFetchData("/admin/users", ["admin-users"])
   const deleteMutation = useDelete((id) => `/admin/users/${id}`, ["admin-users"])
 
-  // Read platform symbol
-  let symbol = "R";
-  if (typeof window !== "undefined") {
-    try {
-      const cached = localStorage.getItem("admin-platform-settings-symbol");
-      if (cached) symbol = cached;
-    } catch (e) {}
-  }
+  const users = Array.isArray(usersRes) ? usersRes : usersRes?.users || usersRes?.data || []
 
-  const users = Array.isArray(usersResponse) ? usersResponse : (usersResponse?.data || [])
-
-  // Calculate dynamic stats
-  const totalUsers = users.length
-  const activeUsers = users.filter(u => u.is_active).length
-  const bannedUsers = users.filter(u => !u.is_active).length
-
-  // Filter users based on query and status (specifically by phone number or ID)
-  const filteredUsers = users.filter(user => {
-    const rawSearch = searchTerm.trim().toLowerCase();
-    const digitsSearch = rawSearch.replace(/\D/g, "");
-
-    const userPhone = (user.phone || "").toLowerCase();
-    const userPhoneDigits = (user.phone || "").replace(/\D/g, "");
-    const userId = (user.id || "").toLowerCase();
-
-    const matchesSearch = 
-      !rawSearch ||
-      userPhone.includes(rawSearch) ||
-      (digitsSearch.length > 0 && userPhoneDigits.includes(digitsSearch)) ||
-      userId.includes(rawSearch);
-
-    const matchesStatus = 
-      statusFilter === "all-status" || 
-      (statusFilter === "active" && user.is_active) || 
-      (statusFilter === "banned" && !user.is_active);
-
-    return matchesSearch && matchesStatus;
-  })
+  const filteredUsers = users.filter(
+    (user) =>
+      user.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.id?.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   const handleDeleteClick = (user) => {
     setUserToDelete(user)
@@ -82,217 +53,172 @@ export default function CustomersPage() {
     try {
       setIsDeleting(true)
       await deleteMutation.mutateAsync(userToDelete.id)
-      toast.success("User account deleted successfully")
       setUserToDelete(null)
       refetch()
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to delete user")
+      // Handled by useDelete hook
     } finally {
       setIsDeleting(false)
     }
   }
 
   return (
-    <div className="space-y-6 pb-12">
-      {/* Top Banner */}
-      <div className="bg-white border-none shadow-sm rounded-lg p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+    <div className="space-y-6 pb-12 font-['Poppins',sans-serif]">
+      {/* Header Banner */}
+      <div className="bg-white border-none shadow-sm rounded-xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-gray-800">All Customers</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage, monitor and update user profiles across your platform.</p>
+          <h1 className="text-xl font-bold text-gray-800">Customer Management</h1>
+          <p className="text-sm text-gray-500 mt-1">View, search, and manage registered members and their accounts.</p>
         </div>
       </div>
 
-      {/* Metric Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="border-none shadow-sm bg-white rounded-lg">
-          <CardContent className="p-6 flex items-center justify-between">
-            <div>
-              <p className="text-[13px] font-medium text-gray-500 tracking-wide">Total Users</p>
-              <h3 className="text-2xl font-bold text-blue-600 mt-1">{totalUsers}</h3>
-            </div>
-            <div className="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
-              <Users className="w-6 h-6" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-none shadow-sm bg-white rounded-lg">
-          <CardContent className="p-6 flex items-center justify-between">
-            <div>
-              <p className="text-[13px] font-medium text-gray-500 tracking-wide">Active Users</p>
-              <h3 className="text-2xl font-bold text-emerald-600 mt-1">{activeUsers}</h3>
-            </div>
-            <div className="w-12 h-12 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
-              <UserCheck className="w-6 h-6" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-none shadow-sm bg-white rounded-lg">
-          <CardContent className="p-6 flex items-center justify-between">
-            <div>
-              <p className="text-[13px] font-medium text-gray-500 tracking-wide">Banned Users</p>
-              <h3 className="text-2xl font-bold text-red-500 mt-1">{bannedUsers}</h3>
-            </div>
-            <div className="w-12 h-12 rounded-lg bg-red-50 flex items-center justify-center text-red-500">
-              <UserX className="w-6 h-6" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Main Table Card */}
-      <Card className="border-none shadow-sm bg-white rounded-lg overflow-hidden">
-        {/* Filter Controls Header */}
-        <div className="p-6 border-b border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="relative flex-1 w-full">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <Input 
-              placeholder="Search by phone number or ID..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 border-gray-200 focus-visible:ring-0 focus-visible:border-blue-500/50 h-10 w-full rounded-lg"
-            />
-          </div>
-
-          <div className="flex items-center gap-3 w-full md:w-auto">
-            <div className="w-full md:w-[180px]">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="border-gray-200 h-10 text-gray-600">
-                  <SelectValue placeholder="All Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all-status">All Status</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="banned">Banned</SelectItem>
-                </SelectContent>
-              </Select>
+      {/* Filter and Search */}
+      <Card className="border-none shadow-sm bg-white rounded-xl">
+        <CardContent className="p-6">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Input
+                placeholder="Search by phone number, email, or user ID..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 border-gray-200 focus-visible:ring-[#4f8cff] h-10 rounded-lg text-sm"
+              />
             </div>
           </div>
-        </div>
-
-        {/* Table Section */}
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader className="bg-gray-50/50 border-b">
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="font-bold text-gray-600 uppercase text-[11px] tracking-wider w-[50px] py-4">#</TableHead>
-                <TableHead className="font-bold text-gray-600 uppercase text-[11px] tracking-wider py-4">PHONE NUMBER</TableHead>
-                <TableHead className="font-bold text-gray-600 uppercase text-[11px] tracking-wider py-4">DEPOSIT BALANCE</TableHead>
-                <TableHead className="font-bold text-gray-600 uppercase text-[11px] tracking-wider py-4">EARNING BALANCE</TableHead>
-                <TableHead className="font-bold text-gray-600 uppercase text-[11px] tracking-wider py-4">REGISTERED</TableHead>
-                <TableHead className="font-bold text-gray-600 uppercase text-[11px] tracking-wider py-4">STATUS</TableHead>
-                <TableHead className="font-bold text-gray-600 uppercase text-[11px] tracking-wider py-4">ACTIONS</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-10 text-gray-500 bg-gray-50/30">
-                    <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-[#5A8DEE]" />
-                    Loading users...
-                  </TableCell>
-                </TableRow>
-              ) : filteredUsers.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="h-[400px] text-center">
-                    <div className="flex flex-col items-center justify-center text-gray-500">
-                      <Search className="w-12 h-12 mb-4 text-gray-300" />
-                      <p className="text-lg font-medium text-gray-600">No users found</p>
-                      <p className="text-sm mt-1 text-gray-400">We couldn't find any users matching your search or filters.</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredUsers.map((user) => (
-                <TableRow key={user.id} className="hover:bg-gray-50 border-b last:border-0">
-                  <TableCell className="font-medium text-gray-700 text-[13px] py-4">
-                    {user.id.substring(0, 8)}...
-                  </TableCell>
-                  <TableCell className="py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-[#5A8DEE] text-white flex items-center justify-center font-bold text-sm shrink-0">
-                        {(user.phone || "U").charAt(0).toUpperCase()}
-                      </div>
-                      <div className="font-bold text-gray-800 text-[13px]">
-                        {user.phone || "Member"}
-                      </div>
-                    </div>
-                  </TableCell>
-
-                  <TableCell className="py-4">
-                    <span className="font-bold text-[#5A8DEE] text-[13px]">{symbol}{Number(user.balance || 0).toFixed(2)}</span>
-                  </TableCell>
-                  <TableCell className="py-4">
-                    <span className="font-bold text-blue-600 text-[13px]">{symbol}{Number(user.withdrawable_balance || 0).toFixed(2)}</span>
-                  </TableCell>
-                  <TableCell className="text-[12px] text-gray-600 py-4 whitespace-nowrap">
-                    {format(new Date(user.created_at), "MMM dd, yyyy")}
-                  </TableCell>
-                  <TableCell className="py-4">
-                    <StatusBadge status={user.is_active ? "ACTIVE" : "BANNED"} />
-                  </TableCell>
-                  <TableCell className="py-4">
-                    <div className="flex items-center gap-1.5">
-                      <Link href={`/customers/${user.id}`}>
-                        <Button variant="outline" size="icon" className="h-7 w-7 text-blue-500 border-gray-200 hover:bg-blue-50" title="Edit">
-                          <Edit className="w-3.5 h-3.5" />
-                        </Button>
-                      </Link>
-                      <Button 
-                        onClick={() => handleDeleteClick(user)}
-                        variant="outline" 
-                        size="icon" 
-                        className="h-7 w-7 text-red-500 border-gray-200 hover:bg-red-50" 
-                        title="Delete"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )))}
-            </TableBody>
-          </Table>
-        </div>
+        </CardContent>
       </Card>
 
-      {/* Delete Confirmation Modal */}
-      {userToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-lg p-6 max-w-sm w-full shadow-lg border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-center gap-3 text-red-600 mb-4">
-              <div className="p-2 bg-red-50 rounded-full">
-                <AlertTriangle className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-bold text-gray-800">Delete User</h3>
-            </div>
-            
-            <p className="text-sm text-gray-500 mb-6">
-              Are you sure you want to delete <span className="font-semibold text-gray-800">{userToDelete.phone || "this user"}</span>? This action is permanent and cannot be undone.
-            </p>
+      {/* Customers Table */}
+      <Card className="border-none shadow-sm bg-white rounded-xl overflow-hidden">
+        <CardHeader className="p-6 pb-4 border-b border-gray-100">
+          <CardTitle className="text-base font-bold text-gray-800">Registered Users ({filteredUsers.length})</CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <Table className="whitespace-nowrap">
+              <TableHeader className="bg-gray-50/50 border-b">
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="font-bold text-gray-600 text-[11px] uppercase tracking-wider pl-6 py-4">USER ID / PHONE</TableHead>
+                  <TableHead className="font-bold text-gray-600 text-[11px] uppercase tracking-wider py-4">BALANCE (ZAR)</TableHead>
+                  <TableHead className="font-bold text-gray-600 text-[11px] uppercase tracking-wider py-4">WITHDRAWABLE (ZAR)</TableHead>
+                  <TableHead className="font-bold text-gray-600 text-[11px] uppercase tracking-wider py-4">SPIN ACCESS</TableHead>
+                  <TableHead className="font-bold text-gray-600 text-[11px] uppercase tracking-wider py-4">JOINED DATE</TableHead>
+                  <TableHead className="font-bold text-gray-600 text-[11px] uppercase tracking-wider text-right pr-6 py-4">ACTIONS</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-10 text-gray-500 bg-gray-50/30">
+                      <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-[#4f8cff]" />
+                      Loading customers...
+                    </TableCell>
+                  </TableRow>
+                ) : filteredUsers.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-12 text-gray-500 bg-gray-50/30">
+                      <Users className="w-10 h-10 mx-auto mb-3 text-gray-400" />
+                      <p className="text-base font-medium text-gray-600 mb-1">No customers found</p>
+                      <p className="text-sm text-gray-500">There are no users matching your search term.</p>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredUsers.map((user) => {
+                    const joinedDate = user.created_at ? format(new Date(user.created_at), "MMM dd, yyyy") : "N/A"
 
-            <div className="flex items-center justify-end gap-3">
-              <Button 
-                variant="outline" 
-                onClick={() => setUserToDelete(null)}
-                disabled={isDeleting}
-                className="border-gray-200 text-gray-700"
-              >
-                Cancel
-              </Button>
-              <Button 
-                onClick={executeDeleteUser}
-                disabled={isDeleting}
-                className="bg-red-600 hover:bg-red-700 text-white font-bold"
-              >
-                {isDeleting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Trash2 className="w-4 h-4 mr-2" />}
-                Delete
-              </Button>
-            </div>
+                    return (
+                      <TableRow key={user.id} className="hover:bg-gray-50 border-b last:border-0">
+                        <TableCell className="pl-6 py-4">
+                          <div className="font-bold text-[14px] text-gray-800 leading-tight">
+                            {user.phone || "No Phone"}
+                          </div>
+                          <div className="text-[11px] text-gray-400 mt-0.5 font-mono">
+                            ID: {user.id ? `${user.id.slice(0, 8)}...` : "N/A"}
+                          </div>
+                        </TableCell>
+                        <TableCell className="py-4 font-bold text-gray-900 text-[14px]">
+                          ZAR {Number(user.balance || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </TableCell>
+                        <TableCell className="py-4 font-bold text-emerald-600 text-[14px]">
+                          ZAR {Number(user.withdrawable_balance || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </TableCell>
+                        <TableCell className="py-4">
+                          <Badge className={`${user.can_spin !== false ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"} border-0 capitalize shadow-none font-bold text-xs`}>
+                            {user.can_spin !== false ? "Allowed" : "Blocked"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-[13px] font-medium text-gray-600 py-4">
+                          {joinedDate}
+                        </TableCell>
+                        <TableCell className="text-right pr-6 py-4">
+                          <div className="flex items-center justify-end space-x-1.5">
+                            <Link href={`/customers/${user.id}`}>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-8 w-8 text-blue-600 border-gray-200 hover:bg-blue-50"
+                                title="View Customer Details"
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                              </Button>
+                            </Link>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-8 w-8 text-red-600 border-gray-200 hover:bg-red-50"
+                              onClick={() => handleDeleteClick(user)}
+                              title="Delete Customer"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })
+                )}
+              </TableBody>
+            </Table>
           </div>
-        </div>
-      )}
+        </CardContent>
+      </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!userToDelete} onOpenChange={(open) => !open && setUserToDelete(null)}>
+        <DialogContent className="sm:max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-gray-800">Delete User Account</DialogTitle>
+            <DialogDescription className="text-gray-500">
+              Are you sure you want to delete user {userToDelete?.phone}? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setUserToDelete(null)}
+              className="border-gray-200"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={executeDeleteUser}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700 text-white font-bold"
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete Account"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState } from "react"
 import { Search, Edit, Package, Plus, Trash2, Loader2, Sparkles, Calendar, DollarSign } from "lucide-react"
@@ -59,7 +59,8 @@ export default function PlansManagementPage() {
   };
 
   const getStatusColor = (status) => {
-    switch (status.toLowerCase()) {
+    const statusStr = typeof status === "boolean" ? (status ? "active" : "inactive") : String(status || "inactive");
+    switch (statusStr.toLowerCase()) {
       case "active":
         return "bg-emerald-100 text-emerald-800"
       case "inactive":
@@ -213,9 +214,11 @@ export default function PlansManagementPage() {
                   </TableRow>
                 ) : filteredPlans.map((plan, index) => {
                   const price = Number(plan.min_investment || 0);
-                  const dailyReturnPercent = Number(plan.daily_income || 0);
-                  const dailyIncomeZar = (price * dailyReturnPercent) / 100;
-                  const totalRevenueZar = dailyIncomeZar * Number(plan.duration || 0);
+                  let dailyIncomeZar = Number(plan.daily_income || 0);
+                  if (dailyIncomeZar <= 1) {
+                    dailyIncomeZar = Number((price * dailyIncomeZar).toFixed(2));
+                  }
+                  const totalRevenueZar = plan.total_revenue ? Number(plan.total_revenue) : Number((dailyIncomeZar * Number(plan.duration || 0)).toFixed(2));
 
                   return (
                     <TableRow key={plan.id} className="hover:bg-gray-50 border-b last:border-0">
@@ -243,14 +246,9 @@ export default function PlansManagementPage() {
                         </span>
                       </TableCell>
                       <TableCell className="py-4">
-                        <div className="flex flex-col">
-                          <span className="font-bold text-emerald-600 text-[14px]">
-                            ZAR {dailyIncomeZar.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
-                          </span>
-                          <span className="text-[11px] text-gray-400">
-                            ({dailyReturnPercent}% daily)
-                          </span>
-                        </div>
+                        <span className="font-bold text-emerald-600 text-[14px]">
+                          ZAR {dailyIncomeZar.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                        </span>
                       </TableCell>
                       <TableCell className="py-4">
                         <span className="font-black text-[#2563eb] text-[14px]">
