@@ -259,9 +259,16 @@ export default function PlansManagementPage() {
                         {plan.duration}-DAYS
                       </TableCell>
                       <TableCell className="py-4">
-                        <Badge className={`${getStatusColor(plan.status ? "active" : "inactive")} border-0 capitalize shadow-none font-bold text-xs`}>
-                          {plan.status ? "Active" : "Inactive"}
-                        </Badge>
+                        <div className="flex flex-col gap-1 items-start">
+                          <Badge className={`${getStatusColor(plan.status ? "active" : "inactive")} border-0 capitalize shadow-none font-bold text-xs`}>
+                            {plan.status ? "Active" : "Inactive"}
+                          </Badge>
+                          {plan.is_sold_out && (
+                            <Badge className="bg-slate-200 text-slate-700 border-0 font-bold text-[10px]">
+                              Sold Out
+                            </Badge>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell className="text-right pr-6 py-4">
                         <div className="flex items-center justify-end space-x-1.5">

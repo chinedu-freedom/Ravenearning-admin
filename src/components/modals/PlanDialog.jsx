@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Camera, Sparkles } from "lucide-react";
+import { Loader2, Camera, Sparkles, Tag } from "lucide-react";
 import { usePost, usePut } from "@/hooks/useApi";
 import { useQueryClient } from "@tanstack/react-query";
 import { Switch } from "@/components/ui/switch";
@@ -26,6 +26,7 @@ const planSchema = z.object({
   dailyIncomeZar: z.coerce.number().min(0.01, "Daily income is required"),
   totalRevenueZar: z.coerce.number().min(0.01, "Total revenue is required"),
   status: z.enum(["active", "inactive"]),
+  is_sold_out: z.boolean().default(false),
 });
 
 export default function PlanDialog({ open, setOpen, initialData }) {
@@ -52,12 +53,14 @@ export default function PlanDialog({ open, setOpen, initialData }) {
       dailyIncomeZar: 78,
       totalRevenueZar: 14040,
       status: "active",
+      is_sold_out: false,
     },
   });
 
   const duration = watch("duration");
   const dailyIncomeZar = watch("dailyIncomeZar");
   const status = watch("status");
+  const isSoldOut = watch("is_sold_out");
 
   useEffect(() => {
     if (duration > 0 && dailyIncomeZar > 0) {
@@ -84,6 +87,7 @@ export default function PlanDialog({ open, setOpen, initialData }) {
         dailyIncomeZar: dailyZar,
         totalRevenueZar: totalRev,
         status: initialData.status ? "active" : "inactive",
+        is_sold_out: initialData.is_sold_out ?? false,
       });
       setImagePreview(initialData.image || null);
       setImageName(initialData.image ? "Current Image" : "");
@@ -96,6 +100,7 @@ export default function PlanDialog({ open, setOpen, initialData }) {
         dailyIncomeZar: 78,
         totalRevenueZar: 14040,
         status: "active",
+        is_sold_out: false,
       });
       setImagePreview(null);
       setImageName("");
@@ -123,6 +128,7 @@ export default function PlanDialog({ open, setOpen, initialData }) {
         capital_return: false,
         is_fixed_deposit: false,
         status: data.status === "active",
+        is_sold_out: Boolean(data.is_sold_out),
         image: imagePreview || "/logo.png",
       };
       
@@ -134,7 +140,7 @@ export default function PlanDialog({ open, setOpen, initialData }) {
       queryClient.invalidateQueries(["plans"]);
       setOpen(false);
     } catch (error) {
-      // Toasts are automatically handled by useApi hook (single toast)
+      // Toasts handled automatically by useApi
     }
   };
 
@@ -150,7 +156,7 @@ export default function PlanDialog({ open, setOpen, initialData }) {
               <DialogTitle className="text-lg font-bold text-gray-900">
                 {isEdit ? "Edit VIP Package" : "Create VIP Package"}
               </DialogTitle>
-              <p className="text-xs text-gray-500">Set exact package price, daily earnings, total revenue, and duration</p>
+              <p className="text-xs text-gray-500">Set exact package price, daily earnings, duration and sold out status</p>
             </div>
           </div>
         </DialogHeader>
@@ -278,16 +284,34 @@ export default function PlanDialog({ open, setOpen, initialData }) {
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-xs flex items-center justify-between">
-            <div>
-              <Label className="text-gray-800 text-sm font-bold block">Active Status</Label>
-              <p className="text-xs text-gray-500">Active packages are visible to members on the investment page</p>
+          {/* Status & Sold Out Controls */}
+          <div className="space-y-3">
+            <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-xs flex items-center justify-between">
+              <div>
+                <Label className="text-gray-800 text-sm font-bold block">Active Status</Label>
+                <p className="text-xs text-gray-500">Active packages are visible to members on the investment page</p>
+              </div>
+              <Switch
+                checked={status === "active"}
+                onCheckedChange={(val) => setValue("status", val ? "active" : "inactive")}
+                className="data-[state=checked]:bg-[#4f8cff]"
+              />
             </div>
-            <Switch
-              checked={status === "active"}
-              onCheckedChange={(val) => setValue("status", val ? "active" : "inactive")}
-              className="data-[state=checked]:bg-[#4f8cff]"
-            />
+
+            <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-xs flex items-center justify-between">
+              <div>
+                <Label className="text-gray-800 text-sm font-bold block flex items-center gap-1.5">
+                  <Tag className="w-4 h-4 text-slate-500" />
+                  Sold Out Status
+                </Label>
+                <p className="text-xs text-gray-500">Marking a product as sold out disables new investments and shows a "Sold Out" badge</p>
+              </div>
+              <Switch
+                checked={isSoldOut}
+                onCheckedChange={(val) => setValue("is_sold_out", val)}
+                className="data-[state=checked]:bg-slate-600"
+              />
+            </div>
           </div>
 
           <div className="flex justify-end gap-3 pt-2">
