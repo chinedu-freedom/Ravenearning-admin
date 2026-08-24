@@ -42,6 +42,11 @@ const basicSettingsSchema = z.object({
   withdrawal_close_time: z.string().optional(),
   require_investment_to_withdraw: z.boolean().default(false),
   min_investment_to_withdraw: z.coerce.number().min(0).default(1),
+  quickpay_enabled: z.boolean().default(true),
+  quickpay_merchant: z.string().optional(),
+  quickpay_key: z.string().optional(),
+  quickpay_url: z.string().optional(),
+  quickpay_channel: z.string().optional(),
 })
 
 export default function BasicSettingsPage() {
@@ -82,6 +87,11 @@ export default function BasicSettingsPage() {
       withdrawal_close_time: "",
       require_investment_to_withdraw: false,
       min_investment_to_withdraw: 1,
+      quickpay_enabled: true,
+      quickpay_merchant: "customerTest01",
+      quickpay_key: "147258",
+      quickpay_url: "https://safricaapi.quickn.vip",
+      quickpay_channel: "8001",
     }
   })
 
@@ -112,7 +122,12 @@ export default function BasicSettingsPage() {
         withdrawal_charge: Number(settingsData.withdrawal_charge) || 15,
         max_deposit: Number(settingsData.max_deposit) || 10000,
         min_deposit: Number(settingsData.min_deposit) || 10,
-        deposit_charge: Number(settingsData.deposit_charge) || 0
+        deposit_charge: Number(settingsData.deposit_charge) || 0,
+        quickpay_enabled: settingsData.quickpay_enabled ?? true,
+        quickpay_merchant: settingsData.quickpay_merchant || "customerTest01",
+        quickpay_key: settingsData.quickpay_key || "147258",
+        quickpay_url: settingsData.quickpay_url || "https://safricaapi.quickn.vip",
+        quickpay_channel: settingsData.quickpay_channel || "8001"
       })
     }
   }, [settingsData, reset])
@@ -145,6 +160,11 @@ export default function BasicSettingsPage() {
         max_withdrawal: Number(formData.max_withdrawal),
         withdrawal_charge: Number(formData.withdrawal_charge),
         min_investment_to_withdraw: Number(formData.min_investment_to_withdraw),
+        quickpay_enabled: Boolean(formData.quickpay_enabled),
+        quickpay_merchant: formData.quickpay_merchant,
+        quickpay_key: formData.quickpay_key,
+        quickpay_url: formData.quickpay_url,
+        quickpay_channel: formData.quickpay_channel,
       }
 
       await updateMutation.mutateAsync(payload)
@@ -295,6 +315,69 @@ export default function BasicSettingsPage() {
                 />
               </div>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      
+      {/* Quick Pay Automatic Gateway Section */}
+      <Card className="border-none shadow-sm bg-white rounded-lg">
+        <CardContent className="p-8">
+          <div className="mb-6">
+            <h2 className="text-[1.2rem] font-bold text-blue-600 flex items-center gap-2 mb-1">
+              <Settings2 className="w-5 h-5" />
+              Quick Pay Automatic Payment Gateway
+            </h2>
+            <p className="text-[12px] text-gray-400">Configure Quick Pay instant payment gateway integration for South Africa</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+            <div className="flex flex-col space-y-1">
+              <label className="text-[13px] font-bold text-gray-700">Quick Pay Automatic Status</label>
+              <Controller
+                name="quickpay_enabled"
+                control={control}
+                render={({ field }) => (
+                  <Select value={field.value ? "enabled" : "disabled"} onValueChange={(val) => field.onChange(val === "enabled")}>
+                    <SelectTrigger className="border-gray-200 focus:border-blue-500/50 focus:ring-0 h-10 rounded-lg text-gray-700 text-[13px] bg-white">
+                      <SelectValue placeholder="Select Gateway Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="enabled">Enabled (Automatic Invoices & Instant Webhook Approval)</SelectItem>
+                      <SelectItem value="disabled">Disabled (Manual Admin Review Only)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <ValidatedInput 
+              label="Merchant Code (payMemberId)" 
+              name="quickpay_merchant"
+              register={register}
+              subText="Your Quick Pay merchant account code (e.g. customerTest01)" 
+            />
+
+            <ValidatedInput 
+              label="Secret Key (MER_KEY)" 
+              name="quickpay_key"
+              register={register}
+              subText="Your Quick Pay merchant secret key for MD5 signing" 
+            />
+
+            <ValidatedInput 
+              label="Gateway Base URL" 
+              name="quickpay_url"
+              register={register}
+              subText="API base URL (e.g. https://safricaapi.quickn.vip)" 
+            />
+
+            <ValidatedInput 
+              label="Pay Channel Code" 
+              name="quickpay_channel"
+              register={register}
+              subText="Payment channel code for South Africa ZAR (default: 8001)" 
+            />
           </div>
         </CardContent>
       </Card>
