@@ -130,7 +130,7 @@ export default function DepositTable({ searchTerm = "", statusFilter = "all" }) 
         if (cached) symbol = cached;
       } catch (e) {}
     }
-    if (!amount) return `${symbol}0`;
+    if (!amount) return `R0`;
     return `${symbol}${amount.toLocaleString()}`;
   };
 

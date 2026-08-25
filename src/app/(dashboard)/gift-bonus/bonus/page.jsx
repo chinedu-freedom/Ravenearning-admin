@@ -166,7 +166,7 @@ export default function GiftBonusPage() {
                         <span className="font-medium text-[#5A8DEE] text-[13px] bg-blue-50 px-2 py-1 rounded-sm">{item.code}</span>
                       </TableCell>
                       <TableCell className="py-4">
-                        <span className="font-medium text-gray-700 text-[13px]">${Number(item.reward_amount).toFixed(2)}</span>
+                        <span className="font-medium text-gray-700 text-[13px]">R {Number(item.reward_amount).toFixed(2)}</span>
                       </TableCell>
                       <TableCell className="py-4">
                         <span className="font-medium text-gray-700 text-[13px]">{item.used_count || 0}</span>

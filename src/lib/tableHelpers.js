@@ -12,7 +12,7 @@ export const formatCurrency = (amount) => {
       if (cached) symbol = cached;
     } catch (e) {}
   }
-  if (isNaN(numAmount)) return `${symbol}0`;
+  if (isNaN(numAmount)) return `R0`;
   
   return `${symbol}${numAmount.toLocaleString(undefined, {
     minimumFractionDigits: 0,
