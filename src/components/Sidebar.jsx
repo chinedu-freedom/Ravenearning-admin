@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -11,8 +11,10 @@ import {
   Loader,
   Users,
   ChevronDown,
-  Sparkles
+  Sparkles,
+  LogOut
 } from "lucide-react";
+import { CookieManager } from "@/utils/cookie-utils";
 
 const navigation = [
   { name: "Home", href: "/dashboard", icon: Home },
@@ -76,6 +78,14 @@ export function Sidebar({ isOpen, onClose }) {
 
   const handleLinkClick = () => {
     if (onClose) onClose();
+  };
+
+  const handleLogout = () => {
+    if (typeof window !== "undefined") {
+      CookieManager.remove("sec-admin-token");
+      CookieManager.remove("isAuthenticated");
+      window.location.href = "/";
+    }
   };
 
   return (
@@ -177,11 +187,20 @@ export function Sidebar({ isOpen, onClose }) {
                 </div>
               );
             })}
+
+            {/* Logout Button */}
+            <div className="pt-4 border-t border-gray-100 mt-4">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13.5px] text-red-600 hover:bg-red-50 font-semibold transition-all duration-200 cursor-pointer border border-red-100/60"
+              >
+                <LogOut className="w-[18px] h-[18px] text-red-500" />
+                <span>Logout</span>
+              </button>
+            </div>
           </nav>
         </div>
       </div>
     </>
   );
 }
-
-

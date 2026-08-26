@@ -1,9 +1,10 @@
-﻿"use client";
+"use client";
 
-import { Bell, Search, Menu, Sparkles } from "lucide-react";
+import { Bell, Search, Menu, Sparkles, LogOut } from "lucide-react";
 import * as Avatar from "@radix-ui/react-avatar";
 import { useFetchData } from "@/hooks/useApi";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CookieManager } from "@/utils/cookie-utils";
 
 export function Header({ onMenuClick }) {
   const { data, isLoading } = useFetchData("/admin/profile", "profile");
@@ -14,6 +15,14 @@ export function Header({ onMenuClick }) {
 
   const displayName = admin?.phone || "Admin";
   const avatarLetter = (admin?.phone ? admin.phone[0] : "A").toUpperCase();
+
+  const handleLogout = () => {
+    if (typeof window !== "undefined") {
+      CookieManager.remove("sec-admin-token");
+      CookieManager.remove("isAuthenticated");
+      window.location.href = "/";
+    }
+  };
 
   return (
     <header className="h-[65px] flex items-center justify-between px-6 bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-20 font-['Poppins',sans-serif]">
@@ -31,7 +40,7 @@ export function Header({ onMenuClick }) {
       </div>
       
       <div className="flex items-center gap-4">
-        <div className="flex items-center gap-3 cursor-pointer">
+        <div className="flex items-center gap-3">
           {isLoading ? (
             <>
               <Skeleton className="h-4 w-24 rounded-md" />
@@ -54,6 +63,15 @@ export function Header({ onMenuClick }) {
                   </Avatar.Fallback>
                 )}
               </Avatar.Root>
+
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold transition-all cursor-pointer border border-red-100 ml-2"
+                title="Log out of Admin Panel"
+              >
+                <LogOut className="w-3.5 h-3.5 text-red-500" />
+                <span className="hidden sm:inline">Logout</span>
+              </button>
             </>
           )}
         </div>
