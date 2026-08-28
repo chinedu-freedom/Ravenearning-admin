@@ -54,7 +54,7 @@ export default function BasicSettingsPage() {
   const [logoPreview, setLogoPreview] = useState("")
 
   const { data: responseData, isLoading } = useFetchData("/settings", ["platform-settings"])
-  const settingsData = responseData?.settings
+  const settingsData = responseData?.settings || responseData
 
   const updateMutation = usePut("/admin/settings/platform", ["platform-settings"])
 
