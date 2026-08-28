@@ -244,6 +244,32 @@ export default function BasicSettingsPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
 
+            <div className="flex flex-col space-y-1 md:col-span-2 bg-blue-50/50 p-4 rounded-xl border border-blue-100 mb-2">
+              <label className="text-[13px] font-bold text-blue-900 flex items-center justify-between">
+                <span>Activity Series Mode (Temporal Event Packages)</span>
+                <span className="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded-full font-bold">FEATURE TOGGLE</span>
+              </label>
+              <Controller
+                name="activity_series_enabled"
+                control={control}
+                render={({ field }) => (
+                  <Select value={field.value ? "enabled" : "disabled"} onValueChange={(val) => field.onChange(val === "enabled")}>
+                    <SelectTrigger className="border-gray-200 focus:border-blue-500/50 focus:ring-0 h-10 rounded-lg text-gray-700 text-[13px] bg-white font-bold">
+                      <SelectValue placeholder="Select Activity Series Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="disabled">Disabled (Hidden from Members)</SelectItem>
+                      <SelectItem value="enabled">Enabled (Active for Members with VIP Plans)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              <p className="text-[11px] text-blue-600 mt-1 font-medium">
+                When enabled, members who have activated a VIP package can view and activate Activity Series packages.
+              </p>
+            </div>
+
+
             <ValidatedInput label="Registration Bonus" name="registration_bonus" type="number" register={register} requiredNote={false} />
           </div>
         </CardContent>
