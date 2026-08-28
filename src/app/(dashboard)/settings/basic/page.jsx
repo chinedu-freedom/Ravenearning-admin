@@ -25,7 +25,7 @@ const basicSettingsSchema = z.object({
   site_name: z.string().min(1, "Site Name is required"),
   currency_name: z.string().min(1, "Currency Name is required"),
   currency_symbol: z.string().min(1, "Currency Symbol is required"),
-  timezone: z.string().min(1, "Timezone is required"),
+  timezone: z.string().optional(),
   registration_bonus: z.coerce.number().min(0, "Must be greater than or equal to 0"),
   telegram_support: z.string().optional(),
   telegram_group: z.string().optional(),
@@ -243,20 +243,7 @@ export default function BasicSettingsPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-            <ValidatedInput label="Site Name" name="site_name" register={register} requiredNote={true} />
             
-            <ValidatedInput label="Currency Name" name="currency_name" register={register} requiredNote={true} />
-            <ValidatedInput label="Currency Symbol" name="currency_symbol" register={register} requiredNote={true} />
-            
-            <div className="flex flex-col space-y-1">
-              <label className="text-[13px] font-bold text-gray-700">Timezone</label>
-              <Controller
-                name="timezone"
-                control={control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="border-gray-200 focus:border-blue-500/50 focus:ring-0 h-10 rounded-lg text-gray-700 text-[13px] bg-white">
-                      <SelectValue placeholder="Select Timezone" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="UTC">UTC</SelectItem>

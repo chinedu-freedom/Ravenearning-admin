@@ -27,6 +27,7 @@ const planSchema = z.object({
   totalRevenueZar: z.coerce.number().min(0.01, "Total revenue is required"),
   status: z.enum(["active", "inactive"]),
   is_sold_out: z.boolean().default(false),
+  category: z.string().default("VIP Series"),
 });
 
 export default function PlanDialog({ open, setOpen, initialData }) {
@@ -54,6 +55,7 @@ export default function PlanDialog({ open, setOpen, initialData }) {
       totalRevenueZar: 14040,
       status: "active",
       is_sold_out: false,
+      category: "VIP Series",
     },
   });
 
@@ -88,6 +90,7 @@ export default function PlanDialog({ open, setOpen, initialData }) {
         totalRevenueZar: totalRev,
         status: initialData.status ? "active" : "inactive",
         is_sold_out: initialData.is_sold_out ?? false,
+        category: initialData.category || "VIP Series",
       });
       setImagePreview(initialData.image || null);
       setImageName(initialData.image ? "Current Image" : "");
@@ -119,6 +122,7 @@ export default function PlanDialog({ open, setOpen, initialData }) {
     try {
       const payload = {
         name: data.title,
+        category: data.category || "VIP Series",
         description: data.description || (data.title + " Investment Plan"),
         duration: Number(data.duration),
         daily_income: Number(data.dailyIncomeZar),
@@ -190,6 +194,37 @@ export default function PlanDialog({ open, setOpen, initialData }) {
                 <Input
                   {...register("description")}
                   placeholder="e.g. VIP1 Smart Projector Package"
+                  className="border-gray-200 focus-visible:ring-[#4f8cff] h-10 rounded-lg text-sm"
+                />
+              </div>
+            </div>
+          </div>
+
+          
+          {/* Series / Category Selection */}
+          <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-xs space-y-3">
+            <Label className="text-gray-800 text-sm font-bold block">Series / Category</Label>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-gray-700 text-xs font-semibold mb-1.5 block">Category Name</Label>
+                <select
+                  {...register("category")}
+                  className="w-full border border-gray-200 focus:ring-[#4f8cff] h-10 rounded-lg text-sm px-3 bg-white font-medium text-gray-800"
+                >
+                  <option value="VIP Series">VIP Series</option>
+                  <option value="Activity Series">Activity Series</option>
+                </select>
+              </div>
+              <div>
+                <Label className="text-gray-700 text-xs font-semibold mb-1.5 block">Or Custom Series</Label>
+                <Input
+                  type="text"
+                  placeholder="e.g. Special Series"
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      setValue("category", e.target.value);
+                    }
+                  }}
                   className="border-gray-200 focus-visible:ring-[#4f8cff] h-10 rounded-lg text-sm"
                 />
               </div>
