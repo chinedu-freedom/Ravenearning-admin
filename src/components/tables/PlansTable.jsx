@@ -127,6 +127,7 @@ export default function PlansTable({ searchTerm = "" }) {
           <TableHeader>
             <TableRow className="bg-gray-50">
               <TableHead className="whitespace-nowrap">Plan Title</TableHead>
+              <TableHead className="whitespace-nowrap">Category</TableHead>
               <TableHead className="whitespace-nowrap">Min Deposit</TableHead>
               <TableHead className="whitespace-nowrap">Max Deposit</TableHead>
               <TableHead className="whitespace-nowrap">Daily Profit</TableHead>
@@ -142,7 +143,7 @@ export default function PlansTable({ searchTerm = "" }) {
           {isLoading ? (
             Array(6)
               .fill(0)
-              .map((_, i) => <TableRowSkeleton key={i} columns={9} />)
+              .map((_, i) => <TableRowSkeleton key={i} columns={10} />)
           ) : filteredData.length ? (
             filteredData.map((plan) => (
               <TableRow key={plan._id}>
@@ -212,7 +213,7 @@ export default function PlansTable({ searchTerm = "" }) {
           ) : (
             <TableRow>
               <TableCell
-                colSpan={9}
+                colSpan={10}
                 className="text-center py-10 text-gray-500"
               >
                 No investment plans found

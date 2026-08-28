@@ -188,6 +188,7 @@ export default function PlansManagementPage() {
                 <TableRow className="hover:bg-transparent">
                   <TableHead className="font-bold text-gray-600 text-[11px] uppercase tracking-wider pl-6 py-4">#</TableHead>
                   <TableHead className="font-bold text-gray-600 text-[11px] uppercase tracking-wider py-4">PRODUCT</TableHead>
+                  <TableHead className="font-bold text-gray-600 text-[11px] uppercase tracking-wider py-4">CATEGORY</TableHead>
                   <TableHead className="font-bold text-gray-600 text-[11px] uppercase tracking-wider py-4">PRICE (ZAR)</TableHead>
                   <TableHead className="font-bold text-gray-600 text-[11px] uppercase tracking-wider py-4">DAILY INCOME (ZAR)</TableHead>
                   <TableHead className="font-bold text-gray-600 text-[11px] uppercase tracking-wider py-4">TOTAL REVENUE (ZAR)</TableHead>
@@ -199,14 +200,14 @@ export default function PlansManagementPage() {
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center py-10 text-gray-500 bg-gray-50/30">
+                    <TableCell colSpan={9} className="text-center py-10 text-gray-500 bg-gray-50/30">
                       <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-[#4f8cff]" />
                       Loading packages...
                     </TableCell>
                   </TableRow>
                 ) : filteredPlans.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center py-12 text-gray-500 bg-gray-50/30">
+                    <TableCell colSpan={9} className="text-center py-12 text-gray-500 bg-gray-50/30">
                       <Package className="w-10 h-10 mx-auto mb-3 text-gray-400" />
                       <p className="text-base font-medium text-gray-600 mb-1">No packages available</p>
                       <p className="text-sm text-gray-500">There are no packages matching your search criteria.</p>
@@ -239,6 +240,15 @@ export default function PlansManagementPage() {
                             <div className="text-[11px] text-gray-500 mt-0.5">{plan.description || "VIP Projector"}</div>
                           </div>
                         </div>
+                      </TableCell>
+                      <TableCell className="py-4">
+                        <Badge className={`border-0 font-bold text-[11px] px-2.5 py-0.5 rounded-full ${
+                          (plan.category || 'VIP Series') === 'Activity Series'
+                            ? 'bg-amber-100 text-amber-800'
+                            : 'bg-blue-100 text-blue-800'
+                        }`}>
+                          {plan.category || 'VIP Series'}
+                        </Badge>
                       </TableCell>
                       <TableCell className="py-4">
                         <span className="font-bold text-gray-900 text-[14px]">
