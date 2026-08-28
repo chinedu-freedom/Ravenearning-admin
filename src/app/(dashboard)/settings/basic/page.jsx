@@ -248,27 +248,75 @@ export default function BasicSettingsPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
 
-            <div className="flex flex-col space-y-1 md:col-span-2 bg-blue-50/50 p-4 rounded-xl border border-blue-100 mb-2">
-              <label className="text-[13px] font-bold text-blue-900 flex items-center justify-between">
-                <span>Activity Series Mode (Temporal Event Packages)</span>
-                <span className="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded-full font-bold">FEATURE TOGGLE</span>
-              </label>
+                        <div className="flex flex-col space-y-2 md:col-span-2 bg-blue-50/60 p-5 rounded-2xl border border-blue-100/80 mb-2 shadow-xs">
+              <div className="flex items-center justify-between">
+                <label className="text-[14px] font-extrabold text-slate-900">
+                  Activity Series Mode (Temporal Event Packages)
+                </label>
+                <span className="text-[10px] bg-blue-600 text-white px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                  FEATURE TOGGLE
+                </span>
+              </div>
+
               <Controller
                 name="activity_series_enabled"
                 control={control}
                 render={({ field }) => (
-                  <Select value={field.value ? "enabled" : "disabled"} onValueChange={(val) => field.onChange(val === "enabled")}>
-                    <SelectTrigger className="border-gray-200 focus:border-blue-500/50 focus:ring-0 h-10 rounded-lg text-gray-700 text-[13px] bg-white font-bold">
-                      <SelectValue placeholder="Select Activity Series Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="disabled">Disabled (Hidden from Members)</SelectItem>
-                      <SelectItem value="enabled">Enabled (Active for Members with VIP Plans)</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    <div
+                      className={`flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all ${
+                        !field.value
+                          ? "bg-white border-blue-500 ring-2 ring-blue-500/20 text-slate-900 shadow-sm"
+                          : "bg-slate-50 border-slate-200 text-slate-500 hover:bg-white"
+                      }`}
+                      onClick={() => field.onChange(false)}
+                    >
+                      <input
+                        type="radio"
+                        name="activity_series_enabled_radio"
+                        checked={!field.value}
+                        onChange={() => field.onChange(false)}
+                        className="w-4 h-4 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                      />
+                      <div>
+                        <span className="font-extrabold text-[13px] block leading-tight text-slate-900">
+                          Disabled (Hidden)
+                        </span>
+                        <span className="text-[11px] text-slate-500 font-medium">
+                          Activity Series tab is hidden from members
+                        </span>
+                      </div>
+                    </div>
+
+                    <div
+                      className={`flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all ${
+                        field.value
+                          ? "bg-white border-blue-500 ring-2 ring-blue-500/20 text-slate-900 shadow-sm"
+                          : "bg-slate-50 border-slate-200 text-slate-500 hover:bg-white"
+                      }`}
+                      onClick={() => field.onChange(true)}
+                    >
+                      <input
+                        type="radio"
+                        name="activity_series_enabled_radio"
+                        checked={Boolean(field.value)}
+                        onChange={() => field.onChange(true)}
+                        className="w-4 h-4 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                      />
+                      <div>
+                        <span className="font-extrabold text-[13px] block leading-tight text-slate-900">
+                          Enabled (Active)
+                        </span>
+                        <span className="text-[11px] text-slate-500 font-medium">
+                          Active for members with a VIP plan
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 )}
               />
-              <p className="text-[11px] text-blue-600 mt-1 font-medium">
+
+              <p className="text-[11.5px] text-blue-600 mt-1 font-medium">
                 When enabled, members who have activated a VIP package can view and activate Activity Series packages.
               </p>
             </div>
