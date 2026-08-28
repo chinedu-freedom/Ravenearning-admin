@@ -243,18 +243,6 @@ export default function BasicSettingsPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-            
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="UTC">UTC</SelectItem>
-                      <SelectItem value="EST">EST</SelectItem>
-                      <SelectItem value="PST">PST</SelectItem>
-                      <SelectItem value="GMT">GMT</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </div>
 
             <ValidatedInput label="Registration Bonus" name="registration_bonus" type="number" register={register} requiredNote={false} />
           </div>
