@@ -17,7 +17,7 @@ export default function Providers({ children }) {
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      <Toaster position="top-right" />
+      <Toaster position="top-right" visibleToasts={1} duration={3000} />
     </QueryClientProvider>
   );
 }
