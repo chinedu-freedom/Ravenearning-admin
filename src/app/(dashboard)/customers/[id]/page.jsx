@@ -4,7 +4,11 @@ import { useState, useEffect, useRef } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { 
-  ArrowLeft, 
+  ArrowLeft,
+  Copy,
+  Check,
+  Landmark,
+  Globe, 
   Phone,
   ShieldAlert,
   CreditCard, 
@@ -43,6 +47,15 @@ import { toast } from "sonner"
 
 export default function CustomerDetailPage() {
   const { id } = useParams()
+  const [copiedField, setCopiedField] = useState(null)
+
+  const copyToClipboard = (text, fieldName) => {
+    if (!text) return;
+    navigator.clipboard.writeText(text);
+    setCopiedField(fieldName);
+    toast.success(`${fieldName} copied to clipboard!`);
+    setTimeout(() => setCopiedField(null), 2000);
+  }
   const router = useRouter()
   const queryClient = useQueryClient()
 
@@ -378,6 +391,101 @@ export default function CustomerDetailPage() {
                       {showNewWithdrawalPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            
+            {/* Linked Payment Methods & Wallets Section */}
+            <div className="space-y-4 pt-4 border-t border-border">
+              <h3 className="text-sm font-semibold text-foreground border-b border-border pb-2 flex items-center justify-between">
+                <span>Linked Payment Methods & Wallets</span>
+                <Badge showDot={false} className="bg-blue-500/10 text-blue-600 border border-blue-500/20 text-xs">
+                  Withdrawal Destinations
+                </Badge>
+              </h3>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Bank Account Details */}
+                <div className="p-4 rounded-xl border border-border bg-card/60 space-y-3 relative overflow-hidden">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-foreground font-semibold text-sm">
+                      <Landmark className="w-4 h-4 text-emerald-500" />
+                      <span>South Africa Bank Details</span>
+                    </div>
+                    {user.bank_account_number ? (
+                      <Badge showDot={false} className="bg-emerald-500/10 text-emerald-600 text-[10px] font-bold">BOUND</Badge>
+                    ) : (
+                      <Badge showDot={false} className="bg-muted text-muted-foreground text-[10px]">NOT BOUND</Badge>
+                    )}
+                  </div>
+
+                  {user.bank_account_number ? (
+                    <div className="space-y-1.5 text-xs">
+                      <div className="flex justify-between items-center text-muted-foreground">
+                        <span>Bank Name:</span>
+                        <span className="font-semibold text-foreground">{user.bank_name || "N/A"}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-muted-foreground">
+                        <span>Account Holder:</span>
+                        <span className="font-semibold text-foreground">{user.bank_account_name || "N/A"}</span>
+                      </div>
+                      <div className="flex justify-between items-center bg-muted/30 p-2 rounded-lg mt-2">
+                        <span className="font-mono text-foreground font-semibold text-sm">{user.bank_account_number}</span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-muted-foreground hover:text-foreground cursor-pointer"
+                          onClick={() => copyToClipboard(user.bank_account_number, "Bank Account Number")}
+                        >
+                          {copiedField === "Bank Account Number" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground italic">No South Africa bank details linked yet.</p>
+                  )}
+                </div>
+
+                {/* USDT Crypto Wallet Details */}
+                <div className="p-4 rounded-xl border border-border bg-card/60 space-y-3 relative overflow-hidden">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-foreground font-semibold text-sm">
+                      <Globe className="w-4 h-4 text-amber-500" />
+                      <span>USDT Crypto Wallet</span>
+                    </div>
+                    {user.usdt_address ? (
+                      <Badge showDot={false} className="bg-amber-500/10 text-amber-600 text-[10px] font-bold">BOUND</Badge>
+                    ) : (
+                      <Badge showDot={false} className="bg-muted text-muted-foreground text-[10px]">NOT BOUND</Badge>
+                    )}
+                  </div>
+
+                  {user.usdt_address ? (
+                    <div className="space-y-1.5 text-xs">
+                      <div className="flex justify-between items-center text-muted-foreground">
+                        <span>Network:</span>
+                        <span className="font-semibold text-amber-500 font-mono">{user.usdt_network || "TRC20"}</span>
+                      </div>
+                      <div className="flex justify-between items-center bg-muted/30 p-2 rounded-lg mt-2 gap-2">
+                        <span className="font-mono text-foreground font-semibold text-xs truncate max-w-[200px]" title={user.usdt_address}>
+                          {user.usdt_address}
+                        </span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-muted-foreground hover:text-foreground cursor-pointer shrink-0"
+                          onClick={() => copyToClipboard(user.usdt_address, "USDT Address")}
+                        >
+                          {copiedField === "USDT Address" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground italic">No USDT crypto wallet address linked yet.</p>
+                  )}
                 </div>
               </div>
             </div>
