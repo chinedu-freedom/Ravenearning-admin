@@ -4,9 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Copy, Plus, Edit2, Trash2 } from "lucide-react";
 
 const mockWallets = [
-  { id: 1, name: "Bitcoin Primary", network: "BTC", address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh", active: true },
-  { id: 2, name: "Ethereum Main", network: "ERC20", address: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F", active: true },
-  { id: 3, name: "USDT Tether", network: "TRC20", address: "TXLaQpe1o1y6xYwWd8bB4E7dD9Vq68z42Y", active: true },
+  { id: 1, name: "USDT BEP20", network: "BEP20", address: "0xC6DD6e8d226bc069Dd6F8745F3D468EA502F9892", active: true },
+  { id: 2, name: "USDT TRC20", network: "TRC20", address: "TXmvGTE6PREAYxWarUissgHWMU9f6dhV4V", active: true },
 ];
 
 export default function WalletsPage() {
@@ -48,7 +47,7 @@ export default function WalletsPage() {
                   </button>
                 </div>
               </div>
-              
+
               <div className="mt-6 space-y-2">
                 <label className="text-[11px] text-gray-400 uppercase tracking-wider font-bold">Wallet Address</label>
                 <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 border border-gray-100 font-mono text-sm text-gray-700 break-all gap-3">
