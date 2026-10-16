@@ -102,8 +102,8 @@ export function Sidebar({ isOpen, onClose }) {
         {/* Brand Header */}
         <div className="flex h-[65px] items-center px-6 border-b border-gray-100">
           <Link href="/dashboard" className="flex items-center w-full group" onClick={handleLinkClick}>
-            <span className="text-[28px] font-black text-gray-900 tracking-tight hover:text-[#4f8cff] transition-colors">
-              Ravenearning
+            <span className="text-[20px] font-black text-gray-900 tracking-tight hover:text-[#4f8cff] transition-colors truncate">
+              suncerestcapital
             </span>
           </Link>
         </div>

@@ -232,9 +232,9 @@ export default function WithdrawalsPage() {
                         </button>
                       </div>
                     ) : (
-                      <button className="text-xs text-gray-500 hover:text-gray-900 transition-colors">
-                        View Receipt
-                      </button>
+                      <span className="text-xs text-gray-400 font-medium">
+                        —
+                      </span>
                     )}
                   </td>
                 </tr>

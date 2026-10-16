@@ -1,4 +1,4 @@
-﻿import { Poppins } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/providers/Providers";
 
@@ -9,12 +9,12 @@ const poppins = Poppins({
 });
 
 export const metadata = {
-  metadataBase: new URL("https://ravenearning-admin.vercel.app"),
+  metadataBase: new URL("https://admin.suncerestcapital.com"),
   title: {
-    default: "Ravenearning Admin Portal",
-    template: "%s | Ravenearning Admin"
+    default: "suncerestcapital Admin Portal",
+    template: "%s | suncerestcapital Admin"
   },
-  description: "Ravenearning Administration & Operations Control Center",
+  description: "suncerestcapital Administration & Operations Control Center",
   icons: {
     icon: [
       { url: "/favicon.ico" },
@@ -30,25 +30,25 @@ export const metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://ravenearning-admin.vercel.app",
-    title: "Ravenearning Admin Portal",
-    description: "Ravenearning Administration & Operations Control Center",
-    siteName: "Ravenearning",
+    url: "https://admin.suncerestcapital.com",
+    title: "suncerestcapital Admin Portal",
+    description: "suncerestcapital Administration & Operations Control Center",
+    siteName: "suncerestcapital",
     images: [
       {
-        url: "https://ravenearning-admin.vercel.app/logo.png",
+        url: "https://suncerestcapital.com/logo.png",
         width: 800,
         height: 800,
-        alt: "Ravenearning Logo",
+        alt: "suncerestcapital Logo",
         type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Ravenearning Admin Portal",
-    description: "Ravenearning Administration & Operations Control Center",
-    images: ["https://ravenearning-admin.vercel.app/logo.png"],
+    title: "suncerestcapital Admin Portal",
+    description: "suncerestcapital Administration & Operations Control Center",
+    images: ["https://suncerestcapital.com/logo.png"],
   },
 };
 
@@ -59,11 +59,11 @@ export default function RootLayout({ children }) {
       className={`${poppins.variable} font-sans h-full antialiased`}
     >
       <head>
-        <meta property="og:image" content="https://ravenearning-admin.vercel.app/logo.png" />
+        <meta property="og:image" content="https://suncerestcapital.com/logo.png" />
         <meta property="og:image:width" content="800" />
         <meta property="og:image:height" content="800" />
         <meta property="og:image:type" content="image/png" />
-        <link rel="image_src" href="https://ravenearning-admin.vercel.app/logo.png" />
+        <link rel="image_src" href="https://suncerestcapital.com/logo.png" />
       </head>
       <body className="min-h-full flex flex-col bg-[#f0f4f8] font-['Poppins',sans-serif]">
         <Providers>{children}</Providers>

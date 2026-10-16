@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,7 +25,7 @@ export default function ForgotPasswordPage() {
 
   const { data: settingsResponse } = useFetchData("/settings", ["platform-settings"]);
   const settings = settingsResponse?.settings || {};
-  const siteName = settings.site_name || "Ravenearning";
+  const siteName = settings.site_name || "suncerestcapital";
 
   const requestOtpMutation = usePost("/auth/admin/forgot-password", null);
 

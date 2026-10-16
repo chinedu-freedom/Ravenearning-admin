@@ -135,7 +135,7 @@ export default function PlanDialog({ open, setOpen, initialData }) {
         is_sold_out: Boolean(data.is_sold_out),
         image: imagePreview || "/logo.png",
       };
-      
+
       if (isEdit) {
         await updatePlanMutation.mutateAsync(payload);
       } else {
@@ -200,7 +200,7 @@ export default function PlanDialog({ open, setOpen, initialData }) {
             </div>
           </div>
 
-          
+
           {/* Series / Category Selection */}
           <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-xs space-y-3">
             <Label className="text-gray-800 text-sm font-bold block">Series / Category</Label>
@@ -324,7 +324,7 @@ export default function PlanDialog({ open, setOpen, initialData }) {
             <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-xs flex items-center justify-between">
               <div>
                 <Label className="text-gray-800 text-sm font-bold block">Active Status</Label>
-                <p className="text-xs text-gray-500">Active packages are visible to members on the investment page</p>
+                <p className="text-xs text-gray-500">Purchase packages are visible to members on the investment page</p>
               </div>
               <Switch
                 checked={status === "active"}

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -36,7 +36,7 @@ export default function LoginPage() {
 
   const { data: settingsResponse, isLoading: isLoadingSettings } = useFetchData("/settings", ["platform-settings"]);
   const settings = settingsResponse?.settings || {};
-  const siteName = settings.site_name || "Ravenearning";
+  const siteName = settings.site_name || "suncerestcapital";
 
   useEffect(() => {
     setIsMounted(true);

@@ -27,16 +27,16 @@ export default function PlansManagementPage() {
   // Modal State
   const [open, setOpen] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState(null)
-  
+
   const [confirmDialog, setConfirmDialog] = useState({
     isOpen: false,
     planId: null,
   });
 
   const { data: plansRes, isLoading } = useFetchData("/admin/plans", ["plans"]);
-  const plansData = Array.isArray(plansRes) 
+  const plansData = Array.isArray(plansRes)
     ? [...plansRes].sort((a, b) => Number(a.min_investment || 0) - Number(b.min_investment || 0))
-    : plansRes?.data 
+    : plansRes?.data
       ? [...plansRes.data].sort((a, b) => Number(a.min_investment || 0) - Number(b.min_investment || 0))
       : [];
 
@@ -74,8 +74,8 @@ export default function PlansManagementPage() {
     const matchesSearch =
       plan.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       plan.description?.toLowerCase().includes(searchTerm.toLowerCase())
-      
-    const matchesStatus = statusFilter === "all" || 
+
+    const matchesStatus = statusFilter === "all" ||
       (statusFilter === "active" ? plan.status === true : plan.status === false);
 
     return matchesSearch && matchesStatus
@@ -94,14 +94,14 @@ export default function PlansManagementPage() {
       bgColor: "bg-blue-50"
     },
     {
-      title: "Active Packages",
+      title: "Purchase packages",
       value: activeCount.toString(),
       icon: Sparkles,
       color: "text-emerald-600",
       bgColor: "bg-emerald-50"
     },
     {
-      title: "Inactive Packages",
+      title: "InPurchase packages",
       value: inactiveCount.toString(),
       icon: Package,
       color: "text-amber-600",
@@ -115,7 +115,7 @@ export default function PlansManagementPage() {
       <div className="bg-white border-none shadow-sm rounded-xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-gray-800">VIP Investment Packages</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage and configure Raven projector investment products and returns.</p>
+          <p className="text-sm text-gray-500 mt-1">Manage and configure suncerestcapital investment products and returns.</p>
         </div>
         <Button
           onClick={() => {
@@ -242,11 +242,10 @@ export default function PlansManagementPage() {
                         </div>
                       </TableCell>
                       <TableCell className="py-4">
-                        <Badge className={`border-0 font-bold text-[11px] px-2.5 py-0.5 rounded-full ${
-                          (plan.category || 'VIP Series') === 'Activity Series'
+                        <Badge className={`border-0 font-bold text-[11px] px-2.5 py-0.5 rounded-full ${(plan.category || 'VIP Series') === 'Activity Series'
                             ? 'bg-amber-100 text-amber-800'
                             : 'bg-blue-100 text-blue-800'
-                        }`}>
+                          }`}>
                           {plan.category || 'VIP Series'}
                         </Badge>
                       </TableCell>

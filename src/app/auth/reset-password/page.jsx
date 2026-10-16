@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -19,7 +19,7 @@ export default function ResetPasswordPage() {
 
   const { data: settingsResponse } = useFetchData("/settings", ["platform-settings"]);
   const settings = settingsResponse?.settings || {};
-  const siteName = settings.site_name || "Ravenearning";
+  const siteName = settings.site_name || "suncerestcapital";
 
   const resetPasswordMutation = usePost("/auth/admin/reset-password", null);
 

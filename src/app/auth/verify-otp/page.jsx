@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -23,7 +23,7 @@ export default function VerifyOtpPage() {
 
   const { data: settingsResponse } = useFetchData("/settings", ["platform-settings"]);
   const settings = settingsResponse?.settings || {};
-  const siteName = settings.site_name || "Ravenearning";
+  const siteName = settings.site_name || "suncerestcapital";
 
   const verifyOtpMutation = usePost("/auth/admin/verify-otp", null);
   const resendOtpMutation = usePost("/auth/admin/forgot-password", null);
