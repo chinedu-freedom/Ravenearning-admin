@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect } from "react"
 import { useForm, Controller } from "react-hook-form"
@@ -30,6 +30,7 @@ const basicSettingsSchema = z.object({
   registration_bonus: z.coerce.number().min(0, "Must be greater than or equal to 0"),
   telegram_support: z.string().optional(),
   telegram_group: z.string().optional(),
+  whatsapp_group: z.string().optional(),
   deposit_notice: z.string().optional(),
   withdrawal_notice: z.string().optional(),
   daily_withdrawal_limit: z.coerce.number().min(0).default(0),
@@ -76,6 +77,7 @@ export default function BasicSettingsPage() {
       registration_bonus: 0,
       telegram_support: "",
       telegram_group: "",
+      whatsapp_group: "",
       deposit_notice: "",
       withdrawal_notice: "",
       daily_withdrawal_limit: 0,
@@ -113,6 +115,7 @@ export default function BasicSettingsPage() {
         registration_bonus: Number(settingsData.registration_bonus) || 0,
         telegram_support: settingsData.telegram_support || settingsData.telegram_support_link || "",
         telegram_group: settingsData.telegram_group || settingsData.telegram_group_chat || settingsData.telegram_link || "",
+        whatsapp_group: settingsData.whatsapp_group || settingsData.whatsapp_link || "",
         deposit_notice: settingsData.deposit_notice || "",
         withdrawal_notice: settingsData.withdrawal_notice || "",
         daily_withdrawal_limit: Number(settingsData.daily_withdrawal_limit) || 0,
@@ -310,6 +313,12 @@ export default function BasicSettingsPage() {
               name="telegram_group"
               register={register}
               subText="Telegram group link for community discussions and member interactions" 
+            />
+            <ValidatedInput 
+              label="WhatsApp Community Group" 
+              name="whatsapp_group"
+              register={register}
+              subText="Direct invitation link to your official WhatsApp community group (e.g. chat.whatsapp.com/...)" 
             />
             
             <div className="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mt-2">
