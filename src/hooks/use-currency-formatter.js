@@ -10,15 +10,15 @@ function getFormatter(locale, options) {
   return formatterCache.get(key);
 }
 
-export function useCurrencyFormat(defaultCurrency = 'ZAR') {
+export function useCurrencyFormat(defaultCurrency = 'ETB') {
   const formatCurrency = useMemo(() => {
     return (amount, currency = defaultCurrency, options = {}) => {
       try {
         const num = Number(amount || 0);
-        if (currency === 'ZAR' || currency === 'R') {
-          return `R ${num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2, ...options })}`;
+        if (currency === 'ETB' || currency === 'Br' || currency === 'ZAR' || currency === 'R') {
+          return `Br ${num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2, ...options })}`;
         }
-        const formatter = getFormatter("en-ZA", {
+        const formatter = getFormatter("en-ET", {
           style: 'currency',
           currency,
           minimumFractionDigits: 0,
@@ -27,7 +27,7 @@ export function useCurrencyFormat(defaultCurrency = 'ZAR') {
         });
         return formatter.format(num);
       } catch (error) {
-        return `R ${Number(amount || 0).toFixed(2)}`;
+        return `Br ${Number(amount || 0).toFixed(2)}`;
       }
     };
   }, [defaultCurrency]);

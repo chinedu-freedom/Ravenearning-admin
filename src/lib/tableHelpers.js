@@ -5,14 +5,14 @@ import {
 
 export const formatCurrency = (amount) => {
   const numAmount = Number(amount);
-  let symbol = "R";
+  let symbol = "Br";
   if (typeof window !== "undefined") {
     try {
       const cached = localStorage.getItem("admin-platform-settings-symbol");
-      if (cached) symbol = cached;
+      if (cached && cached !== "R" && cached !== "ZAR") symbol = cached;
     } catch (e) {}
   }
-  if (isNaN(numAmount)) return `R0`;
+  if (isNaN(numAmount)) return `Br0`;
   
   return `${symbol}${numAmount.toLocaleString(undefined, {
     minimumFractionDigits: 0,

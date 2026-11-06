@@ -71,8 +71,8 @@ export default function BasicSettingsPage() {
     resolver: zodResolver(basicSettingsSchema),
     defaultValues: {
       site_name: "",
-      currency_name: "ZAR",
-      currency_symbol: "R",
+      currency_name: "ETB",
+      currency_symbol: "Br",
       timezone: "UTC",
       registration_bonus: 0,
       telegram_support: "",
@@ -109,8 +109,8 @@ export default function BasicSettingsPage() {
       }
       reset({
         site_name: settingsData.site_name || "",
-        currency_name: settingsData.currency_name || "ZAR",
-        currency_symbol: settingsData.currency_symbol || "R",
+        currency_name: (settingsData.currency_name && settingsData.currency_name !== "ZAR") ? settingsData.currency_name : "ETB",
+        currency_symbol: (settingsData.currency_symbol && settingsData.currency_symbol !== "R" && settingsData.currency_symbol !== "ZAR") ? settingsData.currency_symbol : "Br",
         timezone: settingsData.timezone || "UTC",
         registration_bonus: Number(settingsData.registration_bonus) || 0,
         telegram_support: settingsData.telegram_support || settingsData.telegram_support_link || "",
